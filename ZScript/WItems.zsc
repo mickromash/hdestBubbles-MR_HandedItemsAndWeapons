@@ -1,0 +1,1148 @@
+class Bubble_WornMedikit : Bubble_WornShells
+{	
+    default
+    {
+		-YFLIP
+        HideousBubble.lower 21.;
+        HideousBubble.reach -6.;
+		HideousBubble.shift 0;
+		Bubble_WornShells.ShellType "PortableMedikit";
+		Scale 0.3;
+    }
+	override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		class<Actor> invcls = ShellType;
+		return hdb_worntoggle>0 && target.findinventory(ShellType)&&!(target.findinventory(ShellType)==Target.player.readyweapon&&HDWeapon(target.findInventory(ShellType)).actualamount<2) && (hdb_wornitems>-1&&(target.findinventory(ShellType)==target.player.mo.invsel||HoldUseKey>=hudthreshold1));
+    }
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible && target.GetRenderStyle() !=STYLE_Normal)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        else if (visible&& target == players[consoleplayer].camera&&target.findinventory(ShellType)!=target.player.mo.invsel)A_SetRenderStyle(0.5, STYLE_Translucent);
+		else if(visible)A_SetRenderStyle(1, STYLE_Normal);
+		//else if(visible&&target.findinventory(ShellType)==target.player.mo.invsel)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());}
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+
+        MoveHome();
+		CheckUsing();
+    }
+    states
+    {
+    Spawn:
+        MEDI A 1 {
+			if(target.findinventory(ShellType)==target.player.mo.invSel&&target == players[consoleplayer].camera){
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			else{
+			angle=target.angle;
+			Lower=21;
+			Reach=-6;
+			shift=0;
+			if(target.height>34)pitch=-90;
+			else if (target.height>20)pitch=-45;
+			else pitch=0;}}
+        Wait;
+    }
+}
+Class Bubble_WornZerk : Bubble_WornMedikit
+{
+default
+    {
+        HideousBubble.lower 22.;
+        HideousBubble.reach -6.5;
+		HideousBubble.shift 0;
+		Bubble_WornShells.ShellType "PortableBerserkPack";
+    }
+    states
+    {
+    Spawn:
+        PSTR A 1 {
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			else{
+			angle=target.angle;
+			Lower=21;
+			Reach=-6;
+			shift=0;
+			if(target.height>34)pitch=-90;
+			else if (target.height>20)pitch=-45;
+			else pitch=0;}}
+        Wait;
+    }
+}
+class Bubble_WornStim : Bubble_WornMedikit
+{
+	override void MoveHome()
+    {
+        Vector3 offset;
+        if (pitch_affected)
+        {
+            double tp = min(75., target.pitch + pitch_offset);
+            offset = (AngleToVector(target.angle, abs(cos(tp))), -sin(tp)) * reach;
+        }
+        else
+        {
+            offset = (AngleToVector(target.angle), 0) * reach;
+        }
+        offset += AngleToVector(target.angle - 90., shift);
+		if(target.height<40)home = (target.pos.xy, target.player.viewz+20 - lower) + offset;
+        else home = (target.pos.xy, target.player.viewz - lower) + offset;
+        SetOrigin(home, true);
+    }
+    default
+    {
+        HideousBubble.lower 33.;
+        HideousBubble.reach 1.;
+		HideousBubble.shift -8;
+		Bubble_WornShells.ShellType "PortableStimpack";
+		Scale 0.4;
+    }
+
+    states
+    {
+    Spawn:
+        STIM A 1 {pitch=-90;
+				  angle=target.angle-90;
+			if(target.height>34){}
+			else if (target.height>20){}
+			else {}}
+        Wait;
+    }
+}
+class Bubble_WornBlood : Bubble_WornStim
+{
+    default
+    {
+        HideousBubble.lower 35.;
+        HideousBubble.reach 1.;
+		HideousBubble.shift -8;
+		Bubble_WornShells.ShellType "SecondBlood";
+		Scale 0.4;
+    }
+
+    states
+    {
+    Spawn:
+        PBLD A 1 {
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else{pitch=-90;
+				  angle=target.angle-90;
+				  lower=35;
+			if(target.height>34){}
+			else if (target.height>20){}
+			else {}}}
+        Wait;
+    }
+}
+class Bubble_WornStapler : Bubble_WornStim
+{	
+    default
+    {
+        HideousBubble.lower 35.;
+        HideousBubble.reach -3.;
+		HideousBubble.shift -7.8;
+		Bubble_WornShells.ShellType "HDMedikitter";
+		Scale 0.4;
+    }
+    states
+    {
+    Spawn:
+        MEDI # 1 {
+			let rw = hdweapon(target.findInventory("HDMedikitter"));
+            let hdp = hdplayerpawn(target);
+            if (rw==target.player.readyweapon)Frame=(rw.GetSpareWeaponValue(MEDS_USEDON,true)<0)? 1:2;
+            else let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			scale=rw.Scale;
+			roll=90;
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else{
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){}
+			else if (target.height>20){}
+			else {}}}
+        Wait;
+    }
+}
+class Bubble_WornDerp : Bubble_WornStim
+{
+	Default
+		{
+        -FLATSPRITE
+        -FORCEXYBILLBOARD
+        HideousBubble.lower 27.;
+        HideousBubble.reach -5.;
+		HideousBubble.shift -4;
+		Scale 0.5;
+		Bubble_WornShells.shelltype "DERPUsable";
+		}
+	Override Void PostBeginPlay()
+	{
+	Pitch=-90;
+	Translation=Target.Translation;
+	}	
+		States
+		{
+		Spawn:
+			DERP A 1{
+			if(target.findinventory(ShellType)==target.player.mo.invsel){pitch=-90;angle=target.angle;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else{
+			angle=target.angle+140;
+			if(target.height>34){lower=27;
+			reach=-4;
+			shift=-3;}
+			else if(target.height>10){
+			lower=30;
+			reach=-6;
+			shift=-3;}
+			else{
+			lower=24;
+			reach=-2;
+			shift=-3;}}}
+			wait;
+		}
+}
+class Bubble_WornDerpController : Bubble_WornDerp
+{
+	Default
+		{
+		+FLATSPRITE
+		Bubble_WornShells.shelltype "DERPController";
+		}
+		States
+		{
+		Spawn:
+			DERP H 1{
+			if(target.findinventory(ShellType)==target.player.mo.invsel){pitch=-90;angle=target.angle;
+			Sprite=GetSpriteIndex("DERP");
+			Angle=Target.Angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else{Sprite=GetSpriteIndex("TNT1");}}
+			wait;
+		}
+}
+class Bubble_WornHerp : Bubble_WornDerp
+{
+	Default
+		{
+        HideousBubble.lower 28.;
+        HideousBubble.reach -6.;
+		HideousBubble.shift -2;
+		Scale 0.5;
+		Bubble_WornShells.shelltype "HERPUsable";
+		}
+		States
+		{
+		Spawn:
+			HERP A 1{
+			if(target.findinventory(ShellType)==target.player.mo.invsel){pitch=-90;angle=target.angle;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else{
+			angle=target.angle+150;
+			if(target.height>34){lower=28;
+			reach=-6;
+			shift=-2;}
+			else if(target.height>10){
+			lower=31;
+			reach=-7;
+			shift=-2;}
+			else{
+			lower=24;
+			reach=-2;
+			shift=-3;}}}
+			wait;
+		}
+}
+class Bubble_WornHerpController : Bubble_WornDerpController
+{
+	Default
+		{
+		Bubble_WornShells.shelltype "HERPController";
+		}
+		States
+		{
+		Spawn:
+			HERP H 1{
+			if(target.findinventory(ShellType)==target.player.mo.invsel){pitch=-90;angle=target.angle;
+			Sprite=GetSpriteIndex("HERP");
+			Angle=Target.Angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else{Sprite=GetSpriteIndex("TNT1");}}
+			wait;
+		}
+}
+class Bubble_WornBlurSphere : Bubble_WornStim
+{	
+	int animlap;
+    default
+    {
+		HideousBubble.lower 36.;
+        HideousBubble.reach -5.;
+		HideousBubble.shift -7;
+		Bubble_WornShells.ShellType "HDBlurSphere";
+		Scale 0.3;
+    }
+	override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		class<Actor> invcls = ShellType;
+		return hdb_worntoggle>0 && target.findinventory(ShellType) && (hdb_wornitems>-1&&(target.findinventory(ShellType)==target.player.mo.invsel||HoldUseKey>=hudthreshold1));
+    }
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        //if (visible && target.GetRenderStyle() !=STYLE_Normal)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        if(visible&&target != players[consoleplayer].camera){
+		if(visible)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());}
+        //else A_SetRenderStyle(1, STYLE_Normal);}
+		else if (visible&& target == players[consoleplayer].camera&&target.findinventory(ShellType)!=target.player.mo.invsel)A_SetRenderStyle(0.5, STYLE_Translucent);
+		else if(visible)A_SetRenderStyle(1, STYLE_Normal);
+		if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+
+			pitch=Random(-92,-88);
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			angle=target.angle-Random(92,88);
+			if(target.height>34){lower=Random(32,33);reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle-Random(36,37);
+			if(target.height>34){lower=36;reach=-5;shift=-7;}
+			else if(target.height>20){lower=36;reach=-5;shift=-7;}
+			else{}}
+
+        MoveHome();
+		CheckUsing();
+    }
+    states
+    {
+    Spawn:
+        PINS # Random(1,6){
+			
+			if (animlap<1){
+			if(Frame<3)frame++;
+			else animlap=1;
+			}
+			else {
+			if(Frame>0)Frame=Frame-1;
+			else animlap=0;
+			}}
+        Wait;
+    }
+}
+class Bubble_WornDoorBuster : Bubble_WornStim
+{	
+    default
+    {
+		-FLATSPRITE
+		HideousBubble.lower 34.;
+        HideousBubble.reach -3.;
+		HideousBubble.shift -7;
+		Bubble_WornShells.ShellType "DoorBuster";
+		Scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        BGRN A 1{
+			pitch=-90;
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle-90;
+			if(target.height>34){lower=36;reach=1;shift=-7;}
+			else if(target.height>20){lower=36;reach=-5;shift=-7;}
+			else{}}}
+        Wait;
+    }
+}
+//Class Bubble_WornFlag : Bubble_WornStim
+Class Bubble_WornIED : Bubble_WornStim
+{
+	default
+    {
+		HideousBubble.lower 39.;
+        HideousBubble.reach -3.;
+		HideousBubble.shift -7;
+		Bubble_WornShells.ShellType "HDIEDKit";
+		Scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        IEDS C 1{
+			if(Target.findInventory("DudRocketAmmo")||Target.findInventory("HDRocketAmmo")){Sprite=GetSpriteIndex("IEDS");Frame=2;}
+			Else{Sprite=GetSpriteIndex("IEDK");Frame=0;}
+			pitch=-90;
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle-90;
+			if(target.height>34){lower=39;reach=1;shift=-7;}
+			else if(target.height>20){lower=36;reach=-5;shift=-7;}
+			else{}}}
+        Wait;
+    }
+}
+Class Bubble_WornLadder : Bubble_WornMedikit
+{
+	default
+    {
+		HideousBubble.lower 28.;
+        HideousBubble.reach -6.;
+		HideousBubble.shift 0;
+		Bubble_WornShells.ShellType "PortableLadder";
+		Scale 0.8;
+    }
+	Override Void PostBeginPlay()
+	{
+	Pitch=-90;
+	Translation=Target.Translation;
+	}	
+    states
+    {
+    Spawn:
+        LADD D 1{
+			pitch=-90;
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle;
+			Shift=0;
+			Lower=28;
+			Reach=-6;
+			if(target.height>34){Pitch=-90;}
+			else if(target.height>20){Pitch=-45;}
+			else{}}}
+        Wait;
+    }
+}
+Class Bubble_WornGoggles : Bubble_WornMedikit
+{
+	default
+    {
+		HideousBubble.lower 5.;
+        HideousBubble.reach 3.;
+		HideousBubble.shift 0;
+		Bubble_WornShells.ShellType "PortableLiteAmp";
+		HideousBubble.pitch_affected true;
+		
+		Scale 0.4;
+    }
+	override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		return hdb_worntoggle>0 && target.findinventory(ShellType)&&!(target.findinventory(ShellType)==Target.player.readyweapon&&Target.player.mo.FindInventory(ShellType).amount<2) && (hdb_wornitems>-1 && !(target == players[consoleplayer].camera&&PortableLiteAmp(target.findinventory(ShellType)).worn));
+    }
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible && target.GetRenderStyle() !=STYLE_Normal)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        //else if(visible&&target.findinventory(ShellType)!=target.player.mo.invsel){
+		//if(visible&& target == players[consoleplayer].camera)A_SetRenderStyle(0.5, STYLE_Translucent);
+		else if(visible/*&&target.findinventory(ShellType)==target.player.mo.invsel*/)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+
+        MoveHome();
+		CheckUsing();
+    }
+    states
+    {
+    Spawn:
+        PVIS A 1{
+			pitch=-90;
+			if(target.findinventory(ShellType)==target.player.mo.invsel&&!PortableLiteAmp(target.findinventory(ShellType)).worn){
+			angle=target.angle;
+			Shift=0;
+			Lower=0;
+			Pitch=target.pitch-130;
+			if(target.height>34){Reach=3;Lower=0;}
+			else if(target.height>20){Reach=4;Lower=18;}
+			else{}}
+			
+			else if(!PortableLiteAmp(target.findinventory(ShellType)).worn){
+			angle=target.angle;
+			Shift=0;
+			Lower=-2;
+			Pitch=target.pitch-170;
+			if(target.height>34){Reach=1;Lower=-2;}
+			else if(target.height>20){Reach=2;Lower=16;}
+			else{}}
+			else{
+			angle=target.angle;
+			Shift=0;
+			Lower=2;
+			Pitch=Target.pitch-90;
+			if(target.height>34){Reach=3;Lower=2;}
+			else if(target.height>20){Reach=4;Lower=20;}
+			else{}}}
+        Wait;
+    }
+}
+Class Bubble_WornSuit : Bubble_WornMedikit
+{
+	default
+    {
+		HideousBubble.lower 35.;
+        HideousBubble.reach -6.;
+		HideousBubble.shift 4;
+		Bubble_WornShells.ShellType "PortableRadsuit";
+		Scale 0.6;
+    }
+    states
+    {
+    Spawn:
+        SUIT B 1{
+			if(HDPickup(target.findInventory("WornRadsuit")))Frame=2;
+			else Frame=1;
+			pitch=-90;
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle;
+			Shift=-6;
+			Lower=35;
+			if(target.height>34){Reach=-6;}
+			else if(target.height>20){Reach=-7;}
+			else{}}}
+        Wait;
+    }
+}
+Class Bubble_WornArmourPickup : Bubble_WornMedikit
+{
+	default
+    {
+		HideousBubble.lower 28.;
+        HideousBubble.reach -6.;
+		HideousBubble.shift 4;
+		Bubble_WornShells.ShellType "HDArmour";
+		Scale 0.7;
+    }
+	override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		return hdb_worntoggle>0 && HDPickup(target.findinventory(ShellType)) && (hdb_wornitems>-1&&(HDPickup(target.findinventory(ShellType))==target.player.mo.invsel||HoldUseKey>=hudthreshold1));
+    }
+    states
+    {
+    Spawn:
+        ARMS # 1{
+			pitch=-90;
+			Let Armour = HDArmour(Target.findInventory("HDArmour"));
+			if(Armour.icon!=texman.checkfortexture("ARMCB0",TexMan.Type_MiscPatch))
+			{Sprite=GetSpriteIndex("ARMS");
+			if(Armour.mags[Armour.mags.size()-1]<=28)Frame=6;
+			else if(Armour.mags[Armour.mags.size()-1]<=57)Frame=5;
+			else if(Armour.mags[Armour.mags.size()-1]<=86)Frame=4;
+			else if(Armour.mags[Armour.mags.size()-1]<=115)Frame=3;
+			else if(Armour.mags[Armour.mags.size()-1]>115)Frame=0;}
+			else {Sprite=GetSpriteIndex("ARMC");
+			if(Armour.mags[Armour.mags.size()-1]<=1014)Frame=6;
+			else if(Armour.mags[Armour.mags.size()-1]<=1028)Frame=5;
+			else if(Armour.mags[Armour.mags.size()-1]<=1042)Frame=4;
+			else if(Armour.mags[Armour.mags.size()-1]<=1056)Frame=3;
+			else if(Armour.mags[Armour.mags.size()-1]>1056)Frame=0;}
+			if(HDPickup(target.findinventory(ShellType))==target.player.mo.invsel){
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle;
+			Shift=4;
+			Lower=28;
+			Reach=-6;
+			if(target.height>34){Pitch=-90;}
+			else if(target.height>20){Pitch=-45;}
+			else{}}}
+        Wait;
+    }
+}
+class Bubble_WornShield : Bubble_WornBlurSphere
+{	
+    default
+    {
+		HideousBubble.lower 37.;
+        HideousBubble.reach -3.;
+		Bubble_WornShells.ShellType "ShieldCore";
+		Scale 0.5;
+    }
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+		if(hdb_wornoutofsync)Destroy();
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible && target.GetRenderStyle() !=STYLE_Normal)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        else if(visible&&target.findinventory(ShellType)!=target.player.mo.invsel){
+		if(visible&& target == players[consoleplayer].camera)A_SetRenderStyle(0.5, STYLE_Translucent);
+		else if(visible&&target.findinventory(ShellType)==target.player.mo.invsel)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());}
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+			
+			pitch=-90;
+        	if(target.findinventory(ShellType)==target.player.mo.invsel){
+			angle=target.angle-90;
+			if(target.height>34){lower=32;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle-45;
+			if(target.height>34){lower=37;reach=-3;shift=-7;}
+			else if(target.height>20){lower=37;reach=-4;shift=-7;}
+			else{}}
+
+		
+		MoveHome();
+		CheckUsing();
+    }
+    states
+    {
+    Spawn:
+        BON2 # Random(1,10){
+			
+			if (animlap<1){
+			if(Frame<3)frame++;
+			else animlap=1;
+			}
+			else {
+			if(Frame>0)Frame=Frame-1;
+			else animlap=0;
+			}}
+        Wait;
+    }
+}
+class Bubble_WornMagicShield : Bubble_WornShield
+{	
+    default
+    {
+		Bubble_WornShells.ShellType "HDMagicShield";
+		Scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        BON2 # 1{
+			pitch=-90;
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			if(target.findinventory(ShellType).amount<=256)Frame=0;
+			else if(target.findinventory(ShellType).amount<=512)Frame=1;
+			else if(target.findinventory(ShellType).amount<=768)FRame=2;
+			else Frame=3;
+			Sprite=GetSpriteIndex("BON2");
+			angle=target.angle-90;
+			if(target.height>34){lower=32;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else Sprite=GetSpriteIndex("TNT1");}
+        Wait;
+    }
+}
+class Bubble_WornTalisman : Bubble_WornStim
+{	
+    default
+    {
+		HideousBubble.lower 26.;
+        HideousBubble.reach -8.;
+		HideousBubble.shift -2;
+		Bubble_WornShells.ShellType "SquadSummoner";
+		Scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        PRIF A 1{
+			
+			
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){lower=32;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle;
+			if(target.height>34){lower=26;reach=-8;shift=-2;Pitch=-90;}
+			else if(target.height>20){lower=36;reach=-7;shift=-2;Pitch=-45;}
+			else{}}}
+        Wait;
+    }
+}
+class Bubble_WornReloader : Bubble_WornStim
+{	
+    default
+    {
+		HideousBubble.lower 34.;
+        HideousBubble.reach 0.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.ShellType "AutoReloader";
+		Scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        RLDR A 1{
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){lower=32;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle-90;
+			if(target.height>34){lower=34;reach=0;shift=-5;Pitch=-90;Roll=0;}
+			else if(target.height>20){lower=34;reach=0;shift=-5;Pitch=-90;Roll=90;}
+			else{}}}
+        Wait;
+    }
+}
+class Bubble_WornJetPack : Bubble_WornStim
+{	
+    default
+    {
+		HideousBubble.lower 25.;
+        HideousBubble.reach -4.;
+		HideousBubble.shift 0;
+		Bubble_WornShells.ShellType "HDJetPack";
+		Scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        JPAK A 1{
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){lower=32;reach=1;Shift=-7;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else {
+			angle=target.angle;
+			Roll=0;
+			Shift=0;
+			if(target.height>34){lower=25;reach=-4;Pitch=-90;}
+			else if(target.height>20){lower=27;reach=-4;Pitch=-45;}
+			else{}}}
+        Wait;
+    }
+}
+class Bubble_WornPotion2 : Bubble_WornStim//Too lazy to change the original class
+{	
+    default
+    {
+		Bubble_WornShells.ShellType "HDHealingPotion";
+		Scale 0.4;
+    }
+	override void Tick(){
+	if(hdb_wornoutofsync)Destroy();
+	super.tick();
+	if(target.findinventory("HDHealingPotion") && hdb_wornammo>=0 && target.findinventory("HDHealingPotion") != target.player.ReadyWeapon)SetStateLabel("Spawn");
+	else SetStateLabel("Waiting");
+	}
+    states
+    {
+    Spawn:
+        BON1 A 1 light("HEALTHPOTION"){
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			Sprite=GetSpriteIndex("BON1");
+			Frame=Random(0,3);
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			else Sprite=GetSpriteIndex("TNT1");}
+        Wait;
+	Waiting:
+        BON1 A 1 {
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			Sprite=GetSpriteIndex("BON1");
+			Frame=Random(0,3);
+			pitch=-90;
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			else Sprite=GetSpriteIndex("TNT1");}
+        Wait;	
+    }
+}
+/*class Bubble_WornPotion : Bubble_WornStim//Wich is here
+{
+    override bool CheckVisible(Actor target)
+    {
+		return true;
+    }
+    default
+    {
+        HideousBubble.lower 35.;
+        HideousBubble.reach 0.;
+		HideousBubble.shift 6.;
+    }
+	override void Tick(){
+	if(target.findinventory("HDHealingPotion") && hdb_wornammo>=0 && target.findinventory("HDHealingPotion") != target.player.ReadyWeapon)SetStateLabel("Spawn");
+	else SetStateLabel("Waiting");
+	super.tick();
+	}
+
+    states
+    {
+    Spawn:
+        TNT1 A 1 light("HEALTHPOTION");
+        Wait;
+	Waiting:
+		TNT1 A 1;
+		Wait;
+    }
+}*/
+
+
+
+class Bubble_WornArmor : HideousBubble
+{
+	override bool CheckVisible(Actor target)
+    {
+		 //if (bubbler.weaponBubble) return false;
+		let invc=HDPickup(target.findInventory("WornRadsuit")); 
+		let inva=HDPickup(target.findinventory("HDArmourWorn"));
+        return hdb_worntoggle > 0 && hdb_wornarmor > 1 && (inva||invc) && target == players[consoleplayer].camera;
+    }
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible && target.GetRenderStyle() !=STYLE_Normal)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        
+		else if(visible)A_SetRenderStyle(0.5, STYLE_Translucent);
+
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+
+        MoveHome();
+    }
+	override void MoveHome()
+    {
+        Vector3 offset;
+        if (pitch_affected)
+        {
+            double tp = min(75., target.pitch + pitch_offset);
+            offset = (AngleToVector(target.angle, abs(cos(tp))), -sin(tp)) * reach;
+        }
+        else
+        {
+            offset = (AngleToVector(target.angle), 0) * reach;
+        }
+        offset += AngleToVector(target.angle - 90., shift);
+		if(target.height<40)home = (target.pos.xy, target.player.viewz+20 - lower) + offset;
+        else home = (target.pos.xy, target.pos.z - lower) + offset;
+        SetOrigin(home, true);
+    }
+	default
+    {
+		-FORCEXYBILLBOARD
+        +ROLLSPRITE
+        HideousBubble.lower 23.;
+        HideousBubble.reach 0.;
+		HideousBubble.shift 0;
+        HideousBubble.pitch_affected false;
+		Scale 0.8;
+    }
+	States
+	{
+	Spawn:
+	ARMC # 1{
+			let inva=HDPickup(target.findinventory("HDArmourWorn"));
+			let invc=HDPickup(target.findInventory("WornRadsuit")); 
+			if(inva&&!invc){
+			let invb=HDArmourWorn(target.findinventory("HDArmourWorn"));
+			let gar =invb.mega==false;
+			if(gar){Sprite=GetSpriteIndex("ARMS");
+			if(invb.durability<=28)Frame=6;
+			else if(invb.durability<=57)Frame=5;
+			else if(invb.durability<=86)Frame=4;
+			else if(invb.durability<=115)Frame=3;
+			else if(invb.durability>115)Frame=0;}
+			else {Sprite=GetSpriteIndex("ARMC");
+			if(invb.durability<=14)Frame=6;
+			else if(invb.durability<=28)Frame=5;
+			else if(invb.durability<=42)Frame=4;
+			else if(invb.durability<=56)Frame=3;
+			else if(invb.durability>56)Frame=0;}
+			}
+			else if(invc){Sprite=GetSpriteIndex("SUIT");Frame=1;}
+			angle=target.angle;Pitch=-90;
+			if(!invc){
+			Lower= -33.;
+			if(target.height<34){Lower=33;Pitch=-60;}
+			if(target.height<21){Lower=33;Pitch=0;}}
+			else {
+			Lower= -25.;
+			if(target.height<34){Lower=13;Pitch=-60;}
+			if(target.height<21){Lower=13;Pitch=0;}}}
+	Goto Spawn;
+	}
+}
+class Bubble_WornArmorForOthers : HideousBubble
+{
+	Double armheight;
+	Override Void PostBeginPlay()
+	{
+	Super.PostBeginPlay();
+	if (target.height>34){
+		if(target.height>=64){if(target.pos.z==floorz)armheight=target.height*0.01;else armheight=0;}//210
+		else if(target.height>=62){if(target.pos.z==floorz)armheight=target.height*0.0085;else armheight=0;}//205
+		else if(target.height>=60){if(target.pos.z==floorz)armheight=target.height*0.0075;else armheight=0;}//200
+		else if(target.height>=58){if(target.pos.z==floorz)armheight=target.height*0.0040;else armheight=0;}//195
+		else if(target.height>=56){if(target.pos.z==floorz)armheight=target.height*0.0045;else armheight=0;}//190
+		else if(target.height>=54){if(target.pos.z==floorz)armheight=target.height*0.0015;else armheight=0;}//185
+		else if(target.height>=52)armheight=0;//180
+		else if(target.height>=50){if(target.pos.z==floorz)armheight=-(target.height*0.009);else armheight=0;}//165
+		else if(target.height>=48){if(target.pos.z==floorz)armheight=-(target.height*0.009);else armheight=0;}//160
+		else if(target.height>=46){if(Target.frame!=4&&Target.Frame!=5){if(target.pos.z==floorz)armheight=-(target.height*0.01);else armheight=0;}else if(target.pos.z==floorz) armheight=-(target.height*0.05);}//150//armheight=target.height*0.005;//165
+		else if(target.height>=44){if(Target.frame!=4&&Target.Frame!=5){if(target.pos.z==floorz)armheight=-(target.height*0.01);else armheight=0;}else if(target.pos.z==floorz) armheight=-(target.height*0.05);}//145
+		else if(target.height>=43){if(Target.frame!=4&&Target.Frame!=5){if(target.pos.z==floorz)armheight=-(target.height*0.01);else armheight=0;}else if(target.pos.z==floorz) armheight=-(target.height*0.05);}//145
+		else if(target.height>=42){if(Target.frame!=4&&Target.Frame!=5){if(target.pos.z==floorz)armheight=-(target.height*0.01);else armheight=0;}else if(target.pos.z==floorz) armheight=-(target.height*0.05);}//145
+		else if(target.height>=41){if(Target.frame!=4&&Target.Frame!=5){if(target.pos.z==floorz)armheight=-(target.height*0.01);else armheight=0;}else if(target.pos.z==floorz) armheight=-(target.height*0.05);}//145
+		else if(target.height>=40){if(Target.frame!=4&&Target.Frame!=5){if(target.pos.z==floorz)armheight=-(target.height*0.01);else armheight=0;}else if(target.pos.z==floorz) armheight=-(target.height*0.05);}//140
+		}
+	}
+	override bool CheckVisible(Actor target)
+    {
+		 //if (bubbler.weaponBubble) return false;
+		let inva=HDPickup(target.findinventory("HDArmourWorn"));
+		let invs=HDPickup(target.findinventory("WornRadsuit"));
+        return hdb_worntoggle > 0 && hdb_wornarmor > 0 && (inva||invs) && target != players[consoleplayer].camera;
+    }
+	override void MoveHome()
+    {
+		int onafloor;
+		if(target.pos.z==floorz)onafloor=2;
+		else if(Target.Frame!=4&&Target.Frame!=5)onafloor=0;
+		double armheight1;
+		
+		if (target.height>34)armheight1=armheight;
+		Else if (target.height>20)//{
+		/*if(target.height>=15)*/armheight1=target.height*0.01;//210
+		//}
+		
+        home = (target.pos.xy, target.pos.z+onafloor+armheight1);
+        SetOrigin(home, true);
+    }
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible && target.GetRenderStyle() != STYLE_Normal)A_SetRenderStyle(target.alpha, target.GetRenderStyle());
+		
+		
+		
+		else if(visible&&HDPickup(target.findinventory("HDArmourWorn"))){
+		let invb=HDArmourWorn(target.findinventory("HDArmourWorn"));
+		let gar =invb.mega==false;
+		if(gar){if(invb.durability<=28)A_SetRenderStyle(0.6, STYLE_TRANSLUCENT);
+			else if(invb.durability<=57)A_SetRenderStyle(0.7, STYLE_TRANSLUCENT);
+			else if(invb.durability<=86)A_SetRenderStyle(0.8, STYLE_TRANSLUCENT);
+			else if(invb.durability<=115)A_SetRenderStyle(0.9, STYLE_TRANSLUCENT);
+			else if(invb.durability>115)A_SetRenderStyle(target.alpha, target.GetRenderStyle());}
+		else {if(invb.durability<=14)A_SetRenderStyle(0.6, STYLE_TRANSLUCENT);
+			else if(invb.durability<=28)A_SetRenderStyle(0.7, STYLE_TRANSLUCENT);
+			else if(invb.durability<=42)A_SetRenderStyle(0.8, STYLE_TRANSLUCENT);
+			else if(invb.durability<=56)A_SetRenderStyle(0.9, STYLE_TRANSLUCENT);
+			else if(invb.durability>56)A_SetRenderStyle(target.alpha, target.GetRenderStyle());}}
+			
+
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+
+        MoveHome();
+    }
+	default
+    {
+		-INTERPOLATEANGLES
+        -FLATSPRITE
+        -ROLLSPRITE
+        -FORCEXYBILLBOARD
+        HideousBubble.pitch_affected false;
+		Scale 1.0;
+    }
+	States
+	{
+	Spawn:
+	PRMR A 1{
+		int crouchingframe;
+		let inva=HDPickup(target.findinventory("HDArmourWorn"));
+		let invs=HDPickup(target.findinventory("WornRadsuit"));
+		if(inva&&!invs){
+		let invb=HDArmourWorn(target.findinventory("HDArmourWorn"));
+		let gar =invb.mega==false;
+		if(gar)A_SetTranslation("BlackRifleman");
+		else A_SetTranslation("BattleArmor");}
+		else{A_SetTranslation("RadSuit");}
+			gravity=target.gravity;
+			A_SetSize(Target.Radius,Target.Height);
+			mass=target.mass;
+			angle=target.angle;Pitch=-90;
+		if(target.frame<14&&GetSpriteIndex("PLYC")== Target.Sprite)crouchingframe=14;
+		else crouchingframe=0;
+			if(target.frame>14)sprite=target.sprite;
+			Frame=Target.Frame+crouchingframe;
+			vel.z=target.vel.z;
+			Scale.X=Target.Scale.X;
+			Scale.Y=Target.Scale.Y;}
+	Wait;		
+	}
+}
+
+class Bubble_WornKeys : HideousBubble
+{
+	int HoldUseKey;
+	Void CheckUsing()
+	{
+	if(Target.player.cmd.buttons&BT_USE)HoldUseKey++;
+	Else HoldUseKey=0;
+	}
+	override bool CheckVisible(Actor target)
+    {
+		 //if (bubbler.weaponBubble) return false;
+        int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		return hdb_worntoggle>0 && hdb_wornkeys>0&&(target.countinv("BlueCard")||target.countinv("YellowCard")||target.countinv("RedCard")) &&hdb_wornitems>-1&&(HoldUseKey>=hudthreshold1);
+    }
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible)A_SetRenderStyle(frandom(0.5,0.8), STYLE_Translucent);
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+		CheckUsing();
+		Angle=Target.Angle;
+		Pitch=target.pitch-90;
+        MoveHome();
+    }
+	default
+    {
+		+INTERPOLATEANGLES
+        +FLATSPRITE
+        +ROLLSPRITE
+		+BRIGHT
+        -FORCEXYBILLBOARD
+		HideousBubble.Lower 2;
+		HideousBubble.reach 7;
+		HideousBubble.shift -2.5;
+        HideousBubble.pitch_affected false;
+		Scale 0.035;
+    }
+	States
+	{
+	Spawn:
+	MWBK # 3{int keyframe;
+			int frametics=0;
+			if(target.countinv("BlueCard")&&target.countinv("RedCard")&&target.countinv("YellowCard")) keyframe=3;
+			else if(target.countinv("BlueCard")&&target.countinv("RedCard"))keyframe=2;
+			else if(target.countinv("BlueCard")&&target.countinv("YellowCard"))keyframe=1;
+			else if(target.countinv("YellowCard")&&target.countinv("RedCard"))keyframe=5;
+			else if(target.countinv("BlueCard"))keyframe=0;
+			else if(target.countinv("RedCard"))keyframe=6;
+			else if(target.countinv("YellowCard"))keyframe=4;
+			if(frametics>0){frame=keyframe;frametics=0;}
+			else {frame=keyframe+7;frametics++;}
+			}
+	Wait;		
+	}
+}
+
+class Bubble_WornSkulls : Bubble_WornKeys
+{
+	override bool CheckVisible(Actor target)
+    {
+		 //if (bubbler.weaponBubble) return false;
+        int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		return hdb_worntoggle>0 && hdb_wornkeys>0&&(target.countinv("BlueSkull")||target.countinv("YellowSkull")||target.countinv("RedSkull")) && target == players[consoleplayer].camera&&hdb_wornitems>-1&&(HoldUseKey>=hudthreshold1);
+    }
+	States
+	{
+	Spawn:
+	MWBS # 1{Angle=Target.Angle;
+			Pitch=-90;
+			int keyframe;
+			int frametics=0;
+			if(target.countinv("BlueSkull")&&target.countinv("RedSkull")&&target.countinv("YellowSkull")) keyframe=3;
+			else if(target.countinv("BlueSkull")&&target.countinv("RedSkull"))keyframe=2;
+			else if(target.countinv("BlueSkull")&&target.countinv("YellowSkull"))keyframe=1;
+			else if(target.countinv("YellowSkull")&&target.countinv("RedSkull"))keyframe=5;
+			else if(target.countinv("BlueSkull"))keyframe=0;
+			else if(target.countinv("RedSkull"))keyframe=6;
+			else if(target.countinv("YellowSkull"))keyframe=4;
+			if(frametics<3){frame=keyframe;frametics++;}
+			else {frame=keyframe+7;frametics=random(0,3);}
+			}
+	Wait;		
+	}
+}

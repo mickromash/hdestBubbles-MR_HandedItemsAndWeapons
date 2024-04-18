@@ -1,0 +1,4 @@
+
+GarisonArmor="112:127=116:127"
+BattleArmor="112:127=32:47"
+RadSuit="112:127=88:99"

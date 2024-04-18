@@ -1,0 +1,641 @@
+class Bubble_WornHunter : HideousBubble
+{
+	String WornWeapon;
+	bool bouncing;
+	Property WornWeapon:WornWeapon;
+	Class<Weapon>WornExist;
+	Property bouncing:bouncing;
+	
+	Override Void PostBeginPlay()
+	{
+		WornExist=WornWeapon;
+	}
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible && target.GetRenderStyle() !=STYLE_Normal)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+		else if(visible&& target == players[consoleplayer].camera)A_SetRenderStyle(0.5, STYLE_Translucent);
+		else if(visible)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+
+        MoveHome();
+		CheckUsing();
+    }
+	int HoldUseKey;
+	Void CheckUsing()
+	{
+	if(Target.player.cmd.buttons&BT_USE)HoldUseKey++;
+	Else HoldUseKey=0;
+	}
+    override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		 //if (bubbler.weaponBubble) return false;
+		if(WornExist){
+        let wep = HDWeapon(target.findInventory(WornExist));
+		if(wep){
+        let sprite = wep.GetPickupSprite();
+        if (sprite == "" || sprite == "TNT1") return false;
+		}
+        return hdb_worntoggle>0 && wep &&!(wep.actualamount<2 && wep == target.player.ReadyWeapon)&&(hdb_wornweapons>-1||HoldUseKey>=hudthreshold1||wep==HDPlayerPawn(target).lastweapon||(wep.actualamount>1 && wep == target.player.ReadyWeapon));}
+		return false;
+    }
+	override void MoveHome()
+    {
+        Vector3 offset;
+        if (pitch_affected)
+        {
+            double tp = min(75., target.pitch + pitch_offset);
+            offset = (AngleToVector(target.angle, abs(cos(tp))), -sin(tp)) * reach;
+        }
+        else
+        {
+            offset = (AngleToVector(target.angle), 0) * reach;
+        }
+        offset += AngleToVector(target.angle - 90., shift);
+		if(bouncing){
+		if(target.height<40)home = (target.pos.xy, target.player.viewz+20 - lower) + offset;
+        else home = (target.pos.xy, target.player.viewz - lower) + offset;}
+		else{
+		if(target.height<40)home = (target.pos.xy, target.pos.z+target.height+20 - lower) + offset;
+        else home = (target.pos.xy, target.pos.z+target.height - lower) + offset;}
+        SetOrigin(home, true);
+    }
+	default
+    {
+		+INTERPOLATEANGLES
+        -FORCEXYBILLBOARD
+		+FLATSPRITE
+		HideousBubble.pitch_affected false;
+		+ROLLSPRITE
+		+ROLLCENTER
+		HideousBubble.shift -2;
+		HideousBubble.reach -5.;
+		HideousBubble.lower 22.;
+		Bubble_WornHunter.WornWeapon "Hunter";
+		Bubble_WornHunter.bouncing false;
+    }
+	States
+	{
+	Spawn:
+	HUNT A 1{
+			let rw = hdweapon(target.findInventory(WornExist));
+            let hdp = hdplayerpawn(target);
+			roll=45;
+			if(target.height>34)pitch=-90;
+			else if (target.height>20)pitch=-45;
+			else pitch=0;
+			angle=target.angle;
+			scale=rw.Scale;
+            if (rw==target.player.readyweapon){
+			let sprite_name = rw.getpickupsprite(usespare:true);
+			sprite = GetSpriteIndex(sprite_name);
+			frame = IsSprite(sprite_name)? sprite_name.ByteAt(4) - 65 : 0;}
+            else let sprite_name = CopyWeaponSprite(rw, "TNT1");}
+	wait;
+	}
+}
+
+class Bubble_WornSlayer : Bubble_WornHunter
+{
+	default
+    {
+		+XFLIP
+		HideousBubble.shift 2;
+		HideousBubble.reach -4.;
+		HideousBubble.lower 22.;
+		Bubble_WornHunter.WornWeapon "Slayer";
+    }
+	States
+	{
+	Spawn:
+	SLAY A 1{
+			let rw = hdweapon(target.findInventory(WornExist));
+            let hdp = hdplayerpawn(target);
+			roll=-45;
+			if(target.height>34)pitch=-90;
+			else if (target.height>20)pitch=-45;
+			else pitch=0;
+			angle=target.angle;
+			scale=rw.Scale;
+            if (rw==target.player.readyweapon){
+			let sprite_name = rw.getpickupsprite(usespare:true);
+			sprite = GetSpriteIndex(sprite_name);
+			frame = IsSprite(sprite_name)? sprite_name.ByteAt(4) - 65 : 0;}
+            else let sprite_name = CopyWeaponSprite(rw, "TNT1");}
+	wait;
+	}
+}
+class Bubble_WornBoss : Bubble_WornHunter
+{
+	default
+    {
+		-XFLIP
+		HideousBubble.shift -5;
+		HideousBubble.reach -3.;
+		HideousBubble.lower 22.;
+		Bubble_WornHunter.WornWeapon "BossRifle";
+    }
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(WornExist));
+            let hdp = hdplayerpawn(target);
+			roll=45;
+			if(target.height>34)pitch=-90;
+			else if (target.height>20)pitch=-45;
+			else pitch=0;
+			angle=target.angle;
+			scale=rw.Scale;
+            let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}
+
+class Bubble_WornBronto : Bubble_WornHunter
+{
+	default
+    {
+		+XFLIP
+		HideousBubble.shift -5;
+		HideousBubble.reach -2.;
+		HideousBubble.lower 21.;
+		Bubble_WornHunter.WornWeapon "Brontornis";
+    }
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(WornExist));
+            let hdp = hdplayerpawn(target);
+			roll=-45;
+			if(target.height>34)pitch=-90;
+			else if (target.height>20)pitch=-45;
+			else pitch=0;
+			angle=target.angle;
+			scale=rw.Scale;
+            let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}
+
+class Bubble_WornZM66 : Bubble_WornHunter
+{
+	default
+    {
+		HideousBubble.shift 10;
+		HideousBubble.reach -1.;
+		HideousBubble.lower 31.;
+		Bubble_WornHunter.WornWeapon "ZM66AssaultRifle";
+		Bubble_WornHunter.bouncing true;
+    }
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(WornExist));
+            let hdp = hdplayerpawn(target);
+			roll=30;
+			angle=target.angle-55;
+			lower= 31;
+			shift=10;
+			reach=-1;
+			if(target.height>34)pitch=-110;
+			else if (target.height>20){roll=10;shift=-1;angle=target.angle-5;reach=6;pitch=-100;lower= 37;}
+			else {pitch=180;lower= 35;}
+			scale=rw.Scale;
+            if (rw==target.player.readyweapon){
+			let sprite_name = rw.getpickupsprite(usespare:true);
+			sprite = GetSpriteIndex(sprite_name);
+			frame = IsSprite(sprite_name)? sprite_name.ByteAt(4) - 65 : 0;}
+            else let sprite_name = CopyWeaponSprite(rw, "TNT1");}
+	wait;
+	}
+}
+
+class Bubble_WornLiberator : Bubble_WornHunter
+{
+	default
+    {
+		HideousBubble.shift 9;
+		HideousBubble.reach -2.;
+		HideousBubble.lower 36.;
+		Bubble_WornHunter.WornWeapon "LiberatorRifle";
+    }
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(WornWeapon));
+            let hdp = hdplayerpawn(target);
+			roll=30;
+			angle=target.angle-55;
+			lower= 36;
+			shift=8;
+			reach=-2;
+			if(target.height>34)pitch=-110;
+			else if (target.height>20){roll=10;shift=-1;angle=target.angle-5;reach=7;pitch=-100;lower= 39;}
+			else {pitch=180;lower= 34;}
+			scale=rw.Scale;
+            if (rw==target.player.readyweapon){
+			let sprite_name = rw.getpickupsprite(usespare:true);
+			sprite = GetSpriteIndex(sprite_name);
+			frame = IsSprite(sprite_name)? sprite_name.ByteAt(4) - 65 : 0;}
+            else let sprite_name = CopyWeaponSprite(rw, "TNT1");}
+	wait;
+	}
+}
+
+class Bubble_WornSMG : Bubble_WornHunter
+{
+	default
+    {
+		HideousBubble.shift 11;
+		HideousBubble.reach 1.;
+		HideousBubble.lower 29.;
+		Bubble_WornHunter.WornWeapon "HDSMG";
+		Bubble_WornHunter.bouncing true;
+    }
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory("HDSMG"));
+            let hdp = hdplayerpawn(target);
+			roll=30;
+			angle=target.angle-55;
+			lower= 29;
+			shift=11;
+			reach=1;
+			if(target.height>34)pitch=-114;
+			else if (target.height>20){roll=10;shift=-1;angle=target.angle-5;reach=8;pitch=-100;lower= 36;}
+			else {pitch=180;lower= 34;}
+			scale=rw.Scale;
+            if (rw==target.player.readyweapon){
+			let sprite_name = rw.getpickupsprite(usespare:true);
+			sprite = GetSpriteIndex(sprite_name);
+			frame = IsSprite(sprite_name)? sprite_name.ByteAt(4) - 65 : 0;}
+            else let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}
+class Bubble_WornPistol : Bubble_WornHunter
+{
+    default
+    {
+		HideousBubble.lower 31.;
+        HideousBubble.reach -0.7;
+		HideousBubble.shift -9;
+		Bubble_WornHunter.WornWeapon "HDPistol";
+    }override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		 //if (bubbler.weaponBubble) return false;
+		if(WornExist){
+        let wep = HDWeapon(target.findInventory(WornExist));
+		if(wep){
+        let sprite = wep.GetPickupSprite();
+        if (sprite == "" || sprite == "TNT1") return false;
+		}
+        return hdb_worntoggle>0 && wep && !(wep.actualamount<2&&(wep == target.player.ReadyWeapon&&target.player.getpsprite(PSP_WEAPON).sprite==getspriteindex("PISGA0"))||wep == target.player.ReadyWeapon&&target.player.getpsprite(PSP_WEAPON).sprite==getspriteindex("PISGA0")) &&
+		(((hdb_wornweapons>-2&&wep!=target.player.readyweapon)&&!(Target.Findinventory("HDRevolver")&&!(HDWeapon(Target.Findinventory("HDRevolver"))==target.player.readyweapon&&HDWeapon(Target.Findinventory("HDRevolver")).ActualAmount<2)))
+		||(HoldUseKey>=hudthreshold1&&wep!=target.player.readyweapon)||(wep==HDPlayerPawn(target).lastweapon&&wep!=target.player.readyweapon&&!(Target.Findinventory("HDRevolver")&&!(HDWeapon(Target.Findinventory("HDRevolver"))==target.player.readyweapon&&HDWeapon(Target.Findinventory("HDRevolver")).ActualAmount<2)))||(wep.actualamount>1 && wep == target.player.ReadyWeapon));}
+		return false;
+    }states
+    {
+    Spawn:
+        PIST A 1 { roll=80;
+			angle=Target.angle-80;
+			pitch=-90;
+			let rw = HDWeapon(Target.FindInventory(WornWeapon));
+			scale=rw.Scale;
+            if (rw==target.player.readyweapon){
+			let sprite_name = rw.getpickupsprite(usespare:true);
+			sprite = GetSpriteIndex(sprite_name);
+			frame = IsSprite(sprite_name)? sprite_name.ByteAt(4) - 65 : 0;}
+			else let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+		Wait;
+    }}	
+class Bubble_WornPistol2 : Bubble_WornPistol
+{
+    default
+    {
+		HideousBubble.shift 9;
+    }override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		 //if (bubbler.weaponBubble) return false;
+		if(WornExist){
+        let wep = HDWeapon(target.findInventory(WornExist));
+		if(wep){
+        let sprite = wep.GetPickupSprite();
+        if (sprite == "" || sprite == "TNT1") return false;
+		}
+        return hdb_worntoggle>0 && wep && wep.actualamount>1&&
+		!(HDWeapon(Target.Findinventory("HDRevolver"))&&HDWeapon(Target.Findinventory("HDRevolver"))==target.player.readyweapon&&HDWeapon(Target.Findinventory("HDRevolver")).ActualAmount>1)&&
+		!(wep == target.player.ReadyWeapon&&target.player.getpsprite(PSP_WEAPON).sprite==getspriteindex("PI2GA0"))&&
+		(hdb_wornweapons>-1||HoldUseKey>=hudthreshold1||(wep==HDPlayerPawn(target).lastweapon&&wep!=target.player.readyweapon)||(wep.actualamount>1 && wep == target.player.ReadyWeapon));}
+		return false;
+    }states
+    {
+    Spawn:
+        PIST A 1 { roll=80;
+			angle=Target.angle-100;
+			pitch=-90;
+			let rw = HDWeapon(Target.FindInventory(WornWeapon));
+			scale=rw.Scale;
+			let sprite_name = rw.getpickupsprite(usespare:true);
+			sprite = GetSpriteIndex(sprite_name);
+			frame = IsSprite(sprite_name)? sprite_name.ByteAt(4) - 65 : 0;}
+		Wait;
+    }}		
+class Bubble_WornRevolver : Bubble_WornPistol
+{
+    default
+    {
+		HideousBubble.reach -0.7;
+		HideousBubble.shift -8;
+		HideousBubble.lower 32.;
+		Bubble_WornHunter.WornWeapon "HDRevolver";
+		-XFLIP
+    }
+	override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		 //if (bubbler.weaponBubble) return false;
+		if(WornExist){
+        let wep = HDWeapon(target.findInventory(WornExist));
+		if(wep){
+        let sprite = wep.GetPickupSprite();
+        if (sprite == "" || sprite == "TNT1") return false;
+		}
+        return hdb_worntoggle>0 && wep && !(wep.actualamount<2&&(wep == target.player.ReadyWeapon&&target.player.getpsprite(PSP_WEAPON).sprite==getspriteindex("REVGA0"))||wep == target.player.ReadyWeapon&&target.player.getpsprite(PSP_WEAPON).sprite==getspriteindex("REVGA0")) &&
+		((hdb_wornweapons>-2&&wep!=target.player.readyweapon&&!(HDWeapon(Target.Findinventory("HDPistol"))&&HDWeapon(Target.Findinventory("HDPistol"))==target.player.readyweapon&&HDWeapon(Target.Findinventory("HDPistol")).ActualAmount>1))||(HoldUseKey>=hudthreshold1&&wep!=target.player.readyweapon)||(wep==HDPlayerPawn(target).lastweapon&&wep!=target.player.readyweapon&&!(Target.Findinventory("HDPistol")&&!(HDWeapon(Target.Findinventory("HDPistol"))==target.player.readyweapon&&HDWeapon(Target.Findinventory("HDPistol")).ActualAmount<2)))||(wep.actualamount>1 && wep == target.player.ReadyWeapon));}
+		return false;
+    }states
+    {
+    Spawn:
+        TNT1 A 1 {
+				let rw = HDWeapon(Target.FindInventory(WornWeapon));
+				Angle=Target.Angle-80;
+				pitch=-90;
+				roll=80;
+				scale=rw.Scale;
+				let sprite_name = CopyWeaponSprite(rw, "TNT1");}
+		Wait;
+    }}		
+class Bubble_WornRevolver2 : Bubble_WornRevolver
+{
+    default
+    {
+		HideousBubble.shift 8;
+    }
+	override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		 //if (bubbler.weaponBubble) return false;
+		if(WornExist){
+        let wep = HDWeapon(target.findInventory(WornExist));
+		if(wep){
+        let sprite = wep.GetPickupSprite();
+        if (sprite == "" || sprite == "TNT1") return false;
+		}
+        return hdb_worntoggle>0 && wep && wep.actualamount>1&&!(HDWeapon(Target.Findinventory("HDPistol"))&&HDWeapon(Target.Findinventory("HDPistol"))==target.player.readyweapon&&HDWeapon(Target.Findinventory("HDPistol")).ActualAmount>1)&&!(wep == target.player.ReadyWeapon&&target.player.getpsprite(PSP_WEAPON).sprite==getspriteindex("RRVGA0"))&&(hdb_wornweapons>-1||HoldUseKey>=hudthreshold1||(wep==HDPlayerPawn(target).lastweapon&&wep!=target.player.readyweapon)||(wep.actualamount>1 && wep == target.player.ReadyWeapon));}
+		return false;
+    }states
+    {
+    Spawn:
+        TNT1 A 1 {
+				let rw = HDWeapon(Target.FindInventory(WornWeapon));
+				Angle=Target.Angle-100;
+				pitch=-90;
+				roll=80;
+				scale=rw.Scale;
+				let sprite_name = CopyWeaponSprite(rw, "TNT1");}
+		Wait;
+    }}		
+
+class Bubble_WornBlooper : Bubble_WornHunter
+{
+	default
+    {
+		HideousBubble.shift -7;
+		HideousBubble.reach -3.;
+		HideousBubble.lower 31.;
+		Bubble_WornHunter.WornWeapon "Blooper";
+		Bubble_WornHunter.bouncing true;
+	}
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(WornWeapon));
+            let hdp = hdplayerpawn(target);
+			roll=30;
+			angle=target.angle-55;
+			lower= 31;
+			shift=-7;
+			reach=-3;
+			if(target.height>34)pitch=-80;
+			else if (target.height>20){roll=10;shift=-6;angle=target.angle-1;reach=-3;pitch=-80;lower= 40;}
+			else {pitch=0;lower= 35;}
+			scale=rw.Scale;
+            let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}
+
+class Bubble_WornThunderBuster : Bubble_WornHunter
+{
+	default
+    {
+		HideousBubble.shift -9;
+		HideousBubble.reach -2.;
+		HideousBubble.lower 35.;
+		Bubble_WornHunter.WornWeapon "ThunderBuster";
+		Bubble_WornHunter.bouncing true;
+    }
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(WornWeapon));
+            let hdp = hdplayerpawn(target);
+			roll=20;
+			angle=target.angle-55;
+			lower= 35;
+			shift=-7;
+			reach=-2;
+			if(target.height>34)pitch=-70;
+			else if (target.height>20){roll=20;shift=-5;angle=target.angle-35;reach=-2;pitch=-80;lower= 42;}
+			else {pitch=0;lower= 35;}
+			scale=rw.Scale;
+            let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}
+
+class Bubble_WornChainsaw : Bubble_WornHunter
+{
+	default
+    {
+		HideousBubble.shift -5;
+		HideousBubble.reach -4.;
+		HideousBubble.lower 33.;
+		Bubble_WornHunter.WornWeapon "Lumberjack";
+		Bubble_WornHunter.bouncing true;
+	}
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(WornWeapon));
+            let hdp = hdplayerpawn(target);
+			roll=60;
+			angle=target.angle-35;
+			lower= 33;
+			shift=-5;
+			reach=-4;
+			bFORCEXYBILLBOARD=false;
+			if(target.height>34)pitch=-70;
+			else if (target.height>20){roll=20;shift=-5;angle=target.angle-1;reach=-4;pitch=-80;lower= 40;}
+			else {bFORCEXYBILLBOARD=true;pitch=-90;lower= 35;roll=0;}
+			scale=rw.Scale;
+            let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}
+
+class Bubble_WornBFG : Bubble_WornHunter
+{
+	default
+    {
+		HideousBubble.shift -2;
+		HideousBubble.reach -5.;
+		HideousBubble.lower 33.;
+		Bubble_WornHunter.wornweapon "BFG9K";
+    }
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory("BFG9K"));
+            let hdp = hdplayerpawn(target);
+			roll=30;
+			angle=target.angle+5;
+			lower= 35;
+			shift=-1;
+			reach=-6;
+			bFORCEXYBILLBOARD=false;
+			if(target.height>34)pitch=-75;
+			else if (target.height>20){roll=20;shift=-1;angle=target.angle+10;reach=-5;pitch=-60;lower=35;}
+			else {bFORCEXYBILLBOARD=true;pitch=-90;lower= 35;roll=0;}
+			scale=rw.Scale;
+            let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}
+
+class Bubble_WornVulcanette : Bubble_WornHunter
+{
+	default
+    {
+		HideousBubble.shift 0;
+		HideousBubble.reach -5.;
+		HideousBubble.lower 36.;
+		Bubble_WornHunter.WornWeapon "Vulcanette";
+		Bubble_WornHunter.bouncing true;
+	}
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(WornWeapon));
+            let hdp = hdplayerpawn(target);
+			roll=10;
+			angle=target.angle;
+			lower= 36;
+			shift=0;
+			reach=-5;
+			bFORCEXYBILLBOARD=false;
+			if(target.height>34)pitch=-80;
+			else if (target.height>20){roll=10;shift=0;angle=target.angle;reach=-5;pitch=-90;lower= 40;}
+			else {bFORCEXYBILLBOARD=true;pitch=-90;lower= 35;roll=0;}
+			scale=rw.Scale;
+            let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}
+
+class Bubble_WornRL : Bubble_WornHunter
+{
+	default
+    {
+		HideousBubble.shift -5;
+		HideousBubble.reach -4.;
+		HideousBubble.lower 22.;
+		Bubble_WornHunter.wornweapon "HDRL";
+    }
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(wornweapon));
+            let hdp = hdplayerpawn(target);
+			roll=-90;
+			lower=22;
+			if(target.height>34)pitch=-90;
+			else if (target.height>20){pitch=-30;lower=25;}
+			else pitch=0;
+			angle=target.angle;
+			scale=rw.Scale;
+            let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}
+
+class Bubble_WornCarcanoRifle : Bubble_WornHunter
+{
+	default
+    {
+		-XFLIP
+		HideousBubble.shift -5;
+		HideousBubble.reach -3.;
+		HideousBubble.lower 22.;
+		Bubble_WornHunter.WornWeapon "CarcanoRifle";
+    }
+	States
+	{
+	Spawn:
+	TNT1 A 1{
+			let rw = hdweapon(target.findInventory(WornExist));
+            let hdp = hdplayerpawn(target);
+			roll=45;
+			if(target.height>34)pitch=-90;
+			else if (target.height>20)pitch=-45;
+			else pitch=0;
+			angle=target.angle;
+			scale=rw.Scale;
+            if (rw==target.player.readyweapon){
+			let sprite_name = rw.getpickupsprite(usespare:true);
+			sprite = GetSpriteIndex(sprite_name);
+			frame = IsSprite(sprite_name)? sprite_name.ByteAt(4) - 65 : 0;}
+            else let sprite_name = CopyWeaponSprite(rw, "TNT1");
+			}
+	wait;
+	}
+}

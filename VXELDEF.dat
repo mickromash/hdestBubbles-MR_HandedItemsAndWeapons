@@ -1,0 +1,427 @@
+ZMAGA = "ZMAGA" { UseActorPitch scale = 0.5 }
+ZMAGB = "ZMAGB" { UseActorPitch scale = 0.5 }
+ZMAGC = "ZMAGC" { UseActorPitch scale = 0.5 }
+BPAKB = "BPAKB" {}
+BPAKC = "BPAKC" {}
+MEDIB = "MEDIB" { angleoffset = 180 UseActorPitch }
+MEDIC = "MEDIC" { angleoffset = 180 UseActorPitch }
+/*HUNTG = "HUNTA" { angleoffset = 180 } shela
+HUNTF = "HUNTB" { angleoffset = 180 }
+HUNTE = "HUNTC" { angleoffset = 180 }
+HUNTD = "HUNTD" { angleoffset = 180 }
+HUNTC = "HUNTE" { angleoffset = 180 }
+HUNTB = "HUNTF" { angleoffset = 180 }
+HUNTA = "HUNTG" { angleoffset = 180 }*/
+HUNTG = "HUNTA" { UseActorPitch }
+HUNTF = "HUNTB" { UseActorPitch }
+HUNTE = "HUNTC" { UseActorPitch }
+HUNTD = "HUNTD" { UseActorPitch }
+HUNTC = "HUNTE" { UseActorPitch }
+HUNTB = "HUNTF" { UseActorPitch }
+HUNTA = "HUNTG" { UseActorPitch }
+/*slaya = "slaya" {}
+slayb = "slayb" {}
+slayc = "slayc" {}
+slayd = "slayd" {}
+slaye = "slaye" {}
+slayf = "slayf" {}
+slayg = "slayg" {}*/
+slaya = "slaya" { UseActorPitch angleoffset = 180 }
+slayb = "slayb" { UseActorPitch  angleoffset = 180 }
+slayc = "slayc" { UseActorPitch  angleoffset = 180 }
+slayd = "slayd" { UseActorPitch  angleoffset = 180 }
+slaye = "slaye" { UseActorPitch  angleoffset = 180 }
+slayf = "slayf" { UseActorPitch  angleoffset = 180 }
+slayg = "slayg" { UseActorPitch  angleoffset = 180 }
+//blsta = "blsta" { angleoffset = 180 }
+blsta = "blsta" { UseActorPitch }
+SPLTA = "SPLTA" { UseActorPitch }
+SPLTB = "SPLTB" { UseActorPitch }
+SPLTC = "SPLTC" { UseActorPitch }
+SPLTD = "SPLTD" { UseActorPitch }
+SPLTE = "SPLTE" { UseActorPitch }
+SPLTF = "SPLTF" { UseActorPitch }
+SPLTG = "SPLTG" { UseActorPitch }
+HERPA = "HERPA" { UseActorPitch  angleoffset = 270 }
+HERPB = "HERPB" { UseActorPitch  angleoffset = 270 }
+HERPC = "HERPC" { UseActorPitch  angleoffset = 270 }
+DERPA = "DERPA" { angleoffset = 270 }
+DERPC = "DERPC" { angleoffset = 270 }
+DERPD = "DERPD" { angleoffset = 270 }
+srg2a = "srg2a" { scale = 0.9 }
+srg2b = "srg2b" { scale = 0.9 }
+srg2c = "srg2c" { scale = 0.9 }
+srg2d = "srg2d" { scale = 0.9 }
+srg2e = "srg2e" { scale = 0.9 }
+srg2f = "srg2f" { scale = 0.9 }
+srg2g = "srg2g" { scale = 0.9 }
+srg2h = "srg2h" { scale = 0.9 }
+srg2i = "srg2i" { scale = 0.9 }
+srg2j = "srg2j" { scale = 0.9 }
+srg2k = "srg2k" { scale = 0.9 }
+srg2l = "srg2l" { scale = 0.9 }
+srg2m = "srg2m" { scale = 0.9 }
+srg2n = "srg2n" { scale = 0.9 }
+//revla = "revla" {}
+revla = "revla" { UseActorPitch  angleoffset = 180 }
+brfla = "brfla" { UseActorPitch  angleoffset = 180 }
+brflb = "brflb" { UseActorPitch  angleoffset = 180 }
+brflc = "brflc" { UseActorPitch  angleoffset = 180 }
+brfld = "brfld" { UseActorPitch  angleoffset = 180 }
+brfle = "brfle" { UseActorPitch  angleoffset = 180 }
+brflf = "brflf" { UseActorPitch  angleoffset = 180 }
+brflg = "brflg" { UseActorPitch  angleoffset = 180 }
+brflh = "brflh" { UseActorPitch  angleoffset = 180 }
+brlla = "brlla" { UseActorPitch  angleoffset = 180 }
+brllb = "brllb" { UseActorPitch  angleoffset = 180 }
+brllc = "brllc" { UseActorPitch  angleoffset = 180 }
+brlld = "brlld" { UseActorPitch  angleoffset = 180 }
+brlle = "brlle" { UseActorPitch  angleoffset = 180 }
+brllf = "brllf" { UseActorPitch  angleoffset = 180 }
+brllg = "brllg" { UseActorPitch  angleoffset = 180 }
+brllh = "brllh" { UseActorPitch  angleoffset = 180 }
+//fix by dastrukar
+rifla = "rifla" { UseActorPitch  angleoffset = 180 }
+riflb = "rifla" { UseActorPitch  angleoffset = 90 UseActorPitch }
+riflc = "riflc" { UseActorPitch  angleoffset = 90 UseActorPitch }
+rifld = "rifld" { UseActorPitch  angleoffset = 180 }
+rifsa = "rifsa" { UseActorPitch  angleoffset = 180 }
+rifsd = "rifsd" { UseActorPitch  angleoffset = 180 }
+rigla = "rigla" { UseActorPitch  angleoffset = 180 }
+riglb = "rigla" { UseActorPitch  angleoffset = 90 UseActorPitch }
+riglc = "riglc" { UseActorPitch  angleoffset = 90 UseActorPitch }
+rigld = "rigld" { UseActorPitch  angleoffset = 180 }
+rigsa = "rigsa" { UseActorPitch  angleoffset = 180 }
+rigsd = "rigsd" { UseActorPitch  angleoffset = 180 }
+//
+rmaga = "rmaga" { UseActorPitch  angleoffset = 180 scale = 0.6 }
+rmagb = "rmagb" { UseActorPitch  angleoffset = 180 scale = 0.6 }
+eshla = "eshla" { scale = 0.7 }
+shela = "shela" { scale = 0.7 }
+shl1a = "eshlc" { scale = 0.7 }
+eshlb = "eshlb" { scale = 0.7 }
+eshlc = "eshlc" { scale = 0.7 }
+eshld = "eshlb" { angleoffset = 180 scale = 0.7 }
+eshle = "eshla" { angleoffset = 180 scale = 0.7 }
+eshlf = "eshlf" { scale = 0.7 }
+eshlg = "eshlg" { scale = 0.7 }
+eshlh = "eshlf" { angleoffset = 180 scale = 0.7 }
+//syrga = "syrba" { scale = 0.8 }
+roqpa = "roqpa" { scale = 0.8 }
+rocqa = "rocqa" { scale = 0.9 UseActorPitch }
+rocqb = "rocqa" { UseActorPitch  scale = 0.9 UseActorPitch }
+ten7a = "ten7a" {}
+ten9a = "ten9a" {}
+borfa = "borfa" { UseActorPitch  angleoffset = 90 }
+broca = "broca" {}
+bshxa = "bshxa" {}
+bshxb = "bshxb" {}
+bshxc = "bshxc" {}
+fraga = "fraga" { angleoffset = 180 UseActorPitch }
+fragb = "fragb" { angleoffset = 180 UseActorPitch }
+fragc = "fragc" { angleoffset = 180 UseActorPitch }
+fragd = "fragb" { angleoffset = 0 UseActorPitch }
+fragf = "fragf" { angleoffset = 180 UseActorPitch }
+frgpa = "frgpa" { angleoffset = 180 UseActorPitch }
+3boxa = "3boxa" { angleoffset = 180 }
+7boxa = "7boxa" { angleoffset = 180 }
+9boxa = "9boxa" { angleoffset = 180 }
+armsa = "arm1a" { UseActorPitch UseActorRoll angleoffset = 180 }
+armsb = "arm1a" { UseActorPitch UseActorRoll angleoffset = 180 }
+armca = "armca" { UseActorPitch UseActorRoll angleoffset = 180 } 
+armcb = "armca" { UseActorPitch UseActorRoll angleoffset = 180 }
+bgrna = "bgrna" { angleoffset = 180 }
+bgrnb = "bgrnb" { angleoffset = 180 }
+pblda = "pblda" { angleoffset = 180 }
+jpoda = "jpoda" {}
+jpaka = "jpaka" {}
+cella = "cella" {}
+cellb = "cellb" { angleoffset = 180 }
+cellc = "cellc" { angleoffset = 180 }
+celld = "celld" {}
+clp2a = "clp2a" { UseActorPitch  scale = 0.5 }
+clp2b = "clp2b" { scale = 0.5 }
+clp3a = "clp3a" { scale = 0.5 }
+clp3b = "clp3b" { scale = 0.5 }
+iedka = "iedka" {}
+iedsa = "iedsa" {}
+iedsb = "iedsb" {}
+iedsc = "iedsc" {}
+hcapa = "hcapa" {}
+pistb = "pistb" { UseActorPitch UseActorRoll angleoffset = 180 }
+pistc = "pistc" { UseActorPitch UseActorRoll angleoffset = 180 }
+pistd = "pistd" { UseActorPitch UseActorRoll angleoffset = 180 }
+ambxa = "ambxa" {}
+ambxb = "ambxb" {}
+rldra = "rldra" { angleoffset = 180 }
+rclpa = "rclpa" { angleoffset = 180 }
+rclpb = "rclpb" { angleoffset = 180 }
+rclpc = "rclpc" { angleoffset = 180 }
+rclpd = "rclpd" { angleoffset = 180 }
+rclpe = "rclpe" { angleoffset = 180 }
+smgna = "smgna" { UseActorPitch /* angleoffset = 180 */}
+smgnb = "smsnb" { UseActorPitch /* angleoffset = 180 */}
+smsna = "smsnb" { UseActorPitch /* angleoffset = 180 */}
+smsnb = "smsnb" { UseActorPitch /* angleoffset = 180 */}
+launa = "launb" { UseActorPitch  angleoffset = 270 }
+vulca = "vulca" { UseActorPitch }
+blopa = "blopa" { UseActorPitch  angleoffset = 180 }
+prifa = "prifa" { UseActorPitch  angleoffset = 180 }
+ladda = "lada" {}
+laddb = "ladb" {}
+laddc = "ladc" {}
+laddd = "ladd" { angleoffset = 180 }
+bal7a = "bal7a" { UseActorPitch }
+bal7b = "bal7b" { UseActorPitch }
+fir7a = "fir7a" {}
+fir7b = "fir7b" {}
+fatba = "fatba" { UseActorPitch }
+fatbb = "fatbb" { UseActorPitch }
+/*plyca = "playa" { UseActorPitch UseActorRoll }
+plycb = "playb" { UseActorPitch UseActorRoll }
+plycc = "playc" { UseActorPitch UseActorRoll }
+plycd = "playd" { UseActorPitch UseActorRoll }
+plyce = "playe" { UseActorPitch UseActorRoll }
+plycf = "playf" { UseActorPitch UseActorRoll }
+plycg = "playg" { UseActorPitch UseActorRoll }*/
+//rclpf = "rclpf" {}
+
+// no spin
+csawa = "csawa" { UseActorPitch UseActorRoll  angleoffset = 90 }
+pista = "pista" { UseActorPitch UseActorRoll }
+plasa = "plasa" { UseActorPitch UseActorRoll }
+bfuga = "bfuga" { UseActorPitch UseActorRoll angleoffset = 270 }
+pvisa = "pvisa" { UseActorPitch UseActorRoll }
+launb = "launa" { UseActorPitch UseActorRoll angleoffset = 270 }
+pvisb = "pvisb" { UseActorPitch UseActorRoll }
+pmapa = "pmapa" {}
+pmapb = "pmapb" {}
+pmapc = "pmapc" {}
+pmapd = "pmapd" {}
+pmape = "pmape" {}
+pmapf = "pmapf" {}
+pmapg = "pmapg" {}
+pmaph = "pmaph" {}
+suita = "suita" {}
+bon1a = "bon1a" {UseActorPitch }
+bon1b = "bon1b" {UseActorPitch }
+bon1c = "bon1c" {UseActorPitch }
+bon1d = "bon1d" {UseActorPitch }
+bon2a = "bon2a" {}
+bon2b = "bon2b" {}
+bon2c = "bon2c" {}
+bon2d = "bon2d" {}
+bkeya = "bkeya" {}
+bkeyb = "bkeyb" {}
+rkeya = "rkeya" {}
+rkeyb = "rkeyb" {}
+ykeya = "ykeya" {}
+ykeyb = "ykeyb" {}
+bskua = "bskua" {}
+bskub = "bskub" {}
+rskua = "rskua" {}
+rskub = "rskub" {}
+yskua = "yskua" {}
+yskub = "yskub" {}
+
+
+possh = "possh" { UseActorRoll }
+possi = "possi" { UseActorRoll }
+possj = "possj" { UseActorRoll }
+possk = "possk" { UseActorRoll }
+possl = "possl" { UseActorRoll }
+possm = "possm" { UseActorRoll }
+possn = "possn" { UseActorRoll }
+posso = "posso" { UseActorRoll }
+possp = "possp" { UseActorRoll }
+possq = "possq" { UseActorRoll }
+possr = "possr" { UseActorRoll }
+posss = "posss" { UseActorRoll }
+posst = "posst" { UseActorRoll }
+possu = "possu" { UseActorRoll }
+
+// Shotgun Guy
+sposh = "sposh" { UseActorRoll }
+sposi = "sposi" { UseActorRoll }
+sposj = "sposj" { UseActorRoll }
+sposk = "sposk" { UseActorRoll }
+sposl = "sposl" { UseActorRoll }
+sposm = "sposm" { UseActorRoll }
+sposn = "sposn" { UseActorRoll }
+sposo = "sposo" { UseActorRoll }
+sposp = "sposp" { UseActorRoll }
+sposq = "sposq" { UseActorRoll }
+sposr = "sposr" { UseActorRoll }
+sposs = "sposs" { UseActorRoll }
+spost = "spost" { UseActorRoll }
+sposu = "sposu" { UseActorRoll }
+
+// Imp
+trooi = "trooi" { UseActorRoll }
+trooj = "trooj" { UseActorRoll }
+trook = "trook" { UseActorRoll }
+trool = "trool" { UseActorRoll }
+troom = "troom" { UseActorRoll }
+troon = "troon" { UseActorRoll }
+trooo = "trooo" { UseActorRoll }
+troop = "troop" { UseActorRoll }
+trooq = "trooq" { UseActorRoll }
+troor = "troor" { UseActorRoll }
+troos = "troos" { UseActorRoll }
+troot = "troot" { UseActorRoll }
+troou = "troou" { UseActorRoll }
+
+// Pinky
+sargi = "sargi" { UseActorRoll }
+sargj = "sargj" { UseActorRoll }
+sargk = "sargk" { UseActorRoll }
+sargl = "sargl" { UseActorRoll }
+sargm = "sargm" { UseActorRoll }
+sargn = "sargn" { UseActorRoll }
+
+// Cacodemon
+headg = "headg" { UseActorRoll }
+headh = "headh" { UseActorRoll }
+headi = "headi" { UseActorRoll }
+headj = "headj" { UseActorRoll }
+headk = "headk" { UseActorRoll }
+headl = "headl" { UseActorRoll }
+
+// Lost Soul
+skulf = "skulf" { UseActorRoll }
+skulg = "skulg" { UseActorRoll }
+skulh = "skulh" { UseActorRoll }
+skuli = "skuli" { UseActorRoll }
+skulj = "skulj" { UseActorRoll }
+skulk = "skulk" { UseActorRoll }
+
+// Baron of Hell
+bossi = "bossi" { UseActorRoll }
+bossj = "bossj" { UseActorRoll }
+bossk = "bossk" { UseActorRoll }
+bossl = "bossl" { UseActorRoll }
+bossm = "bossm" { UseActorRoll }
+bossn = "bossn" { UseActorRoll }
+bosso = "bosso" { UseActorRoll }
+
+// Cyberdemon
+cybrh = "cybrh" { UseActorRoll }
+cybri = "cybri" { UseActorRoll }
+cybrj = "cybrj" { UseActorRoll }
+cybrk = "cybrk" { UseActorRoll }
+cybrl = "cybrl" { UseActorRoll }
+cybrm = "cybrm" { UseActorRoll }
+cybrn = "cybrn" { UseActorRoll }
+cybro = "cybro" { UseActorRoll }
+cybrp = "cybrp" { UseActorRoll }
+
+// Spider Mastermind
+spidj = "spidj" { UseActorRoll }
+spidk = "spidk" { UseActorRoll }
+spidl = "spidl" { UseActorRoll }
+spidm = "spidm" { UseActorRoll }
+spidn = "spidn" { UseActorRoll }
+spido = "spido" { UseActorRoll }
+spidp = "spidp" { UseActorRoll }
+spidq = "spidq" { UseActorRoll }
+spidr = "spidr" { UseActorRoll }
+spids = "spids" { UseActorRoll }
+
+// Doomguy
+playh = "playh" { UseActorRoll }
+playi = "playi" { UseActorRoll }
+playj = "playj" { UseActorRoll }
+playk = "playk" { UseActorRoll }
+playl = "playl" { UseActorRoll }
+playm = "playm" { UseActorRoll }
+playn = "playn" { UseActorRoll }
+playo = "playo" { UseActorRoll }
+playp = "playp" { UseActorRoll }
+playq = "playq" { UseActorRoll }
+playr = "playr" { UseActorRoll }
+plays = "plays" { UseActorRoll }
+playt = "playt" { UseActorRoll }
+playu = "playu" { UseActorRoll }
+playv = "playv" { UseActorRoll }
+playw = "playw" { UseActorRoll }
+
+bspij = "bspij" { UseActorRoll }
+bspik = "bspik" { UseActorRoll }
+bspil = "bspil" { UseActorRoll }
+bspim = "bspim" { UseActorRoll }
+bspin = "bspin" { UseActorRoll }
+bspio = "bspio" { UseActorRoll }
+bspip = "bspip" { UseActorRoll }
+
+// Arch Vile
+vileq = "vileq" { UseActorRoll }
+viler = "viler" { UseActorRoll }
+viles = "viles" { UseActorRoll }
+vilet = "vilet" { UseActorRoll }
+vileu = "vileu" { UseActorRoll }
+vilev = "vilev" { UseActorRoll }
+vilew = "vilew" { UseActorRoll }
+vilex = "vilex" { UseActorRoll }
+viley = "viley" { UseActorRoll }
+vilez = "vilez" { UseActorRoll }
+
+// Chaingunner
+cposh = "cposh" { UseActorRoll }
+cposi = "cposi" { UseActorRoll }
+cposj = "cposj" { UseActorRoll }
+cposk = "cposk" { UseActorRoll }
+cposl = "cposl" { UseActorRoll }
+cposm = "cposm" { UseActorRoll }
+cposn = "cposn" { UseActorRoll }
+
+// Hell Knight
+bos2i = "bos2i" { UseActorRoll }
+bos2j = "bos2j" { UseActorRoll }
+bos2k = "bos2k" { UseActorRoll }
+bos2l = "bos2l" { UseActorRoll }
+bos2m = "bos2m" { UseActorRoll }
+bos2n = "bos2n" { UseActorRoll }
+bos2o = "bos2o" { UseActorRoll }
+
+// Mancubus
+fattk = "fattk" { UseActorRoll }
+fattl = "fattl" { UseActorRoll }
+fattm = "fattm" { UseActorRoll }
+fattn = "fattn" { UseActorRoll }
+fatto = "fatto" { UseActorRoll }
+fattp = "fattp" { UseActorRoll }
+fattq = "fattq" { UseActorRoll }
+fattr = "fattr" { UseActorRoll }
+fatts = "fatts" { UseActorRoll }
+fattt = "fattt" { UseActorRoll }
+
+// Pain Elemental
+painh = "painh" { UseActorRoll }
+paini = "paini" { UseActorRoll }
+painj = "painj" { UseActorRoll }
+paink = "paink" { UseActorRoll }
+painl = "painl" { UseActorRoll }
+painm = "painm" { UseActorRoll }
+
+// Revenant
+skell = "skell" { UseActorRoll }
+skelm = "skelm" { UseActorRoll }
+skeln = "skeln" { UseActorRoll }
+skelo = "skelo" { UseActorRoll }
+skelp = "skelp" { UseActorRoll }
+skelq = "skelq" { UseActorRoll }
+
+sswvi = "sswvi" { UseActorRoll }
+sswvj = "sswvj" { UseActorRoll }
+sswvk = "sswvk" { UseActorRoll }
+sswvl = "sswvl" { UseActorRoll }
+sswvm = "sswvm" { UseActorRoll }
+sswvn = "sswvn" { UseActorRoll }
+sswvo = "sswvo" { UseActorRoll }
+sswvp = "sswvp" { UseActorRoll }
+sswvq = "sswvq" { UseActorRoll }
+sswvr = "sswvr" { UseActorRoll }
+sswvs = "sswvs" { UseActorRoll }
+sswvt = "sswvt" { UseActorRoll }
+sswvu = "sswvu" { UseActorRoll }
+sswvv = "sswvv" { UseActorRoll }

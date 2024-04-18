@@ -1,0 +1,56 @@
+OptionMenu "HDestBubbleMenu"
+{
+	Title "Hideous Bubbles"
+    Option "$BUBBLEEnabled", "hdb_enabled", "OnOff"
+    Option "$BUBBLEBPACK", "hdb_wornbackpacks", "OnOff"
+    Option "$BUBBLEHEADINDI", "hdb_headings", "OnOff"
+    Option "$BUBBLEPLAYERWEAP", "hdb_weapons", "OnOff"
+    Option "$BUBBLEWEAPVISIBLE", "hdb_visibletoself", "OnOff"
+	Option "$BUBBLEWORNTOGGLE", "hdb_worntoggle", "OnOff"
+	Control "$BUBBLEWORNTOGGLEKEY", "toggle hdb_worntoggle"
+	Option "$BUBBLEMMANAGER", "hdb_magstyle", "BubblesMagScaleOption"
+	Option "$BUBBLEWORNAMMO", "hdb_wornammo", "BubblesMagWornAmmo"
+	Option "$BUBBLEWORNMAGS", "hdb_wornmags", "OnOff"
+	Option "$BUBBLEWORNITEMS", "hdb_wornitems", "BubbleMagWornItems"
+	Option "$BUBBLEWORNKEYS", "hdb_wornkeys", "OnOff"
+	Option "$BUBBLEWORNWEAPONS", "hdb_wornweapons", "BubblesMagWornWeapons"
+	Option "$BUBBLEWORNAROMOR", "hdb_wornarmor", "BubbleMagWornArmor"
+	StaticText ""
+	Option "$BUBBLEWORNSYNC", "hdb_wornoutofsync", "OnOff"
+	StaticText "$BUBBLEWORNTURNTHISOFF"
+	StaticText ""
+	StaticText "$BUBBLERECOMENDATION", 1
+	Option "$DSPLYMNU_PLAYERSPRITES", "r_drawplayersprites", "OnOff"
+}
+
+OptionValue "BubblesMagScaleOption"
+{
+	-1, "$BUBBLEDONTSCALE"
+	0, "$BUBBLEACTORSCALE"
+}
+
+OptionValue "BubblesMagWornAmmo"
+{
+	-1, "$MRBUBBLENEVER"
+	1, "$MRBUBBLEALWAYS"
+	0, "$MRBUBBLEONWEAP"
+}
+
+OptionValue "BubblesMagWornWeapons"
+{
+	-1, "$MRBUBBLEWEPN"
+	1, "$MRBUBBLEWEPA"
+}
+
+OptionValue "BubbleMagWornItems"
+{
+	-1, "$MRBUBBLEITEMN"
+	1, "$MRBUBBLEWEPA"
+}
+
+OptionValue "BubbleMagWornArmor"
+{
+	0, "$MRBUBBLENOARMOR"
+	1, "$MRBUBBLEOTHERSARMOR"
+	2, "$MRBUBBLEARMORBOTH"
+}

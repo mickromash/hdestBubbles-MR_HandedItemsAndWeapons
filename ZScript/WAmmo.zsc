@@ -1,0 +1,2690 @@
+class Bubble_WornGrenade : HideousBubble
+{
+	int GranCount;
+	Property Grancount:Grancount;
+	int HoldUseKey;
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible && target.GetRenderStyle() !=STYLE_Normal)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+		else if(visible&&hdb_wornammo>-1&& target == players[consoleplayer].camera &&!HDGrenadeThrower(target.player.readyweapon))A_SetRenderStyle(0.5, STYLE_Translucent);
+		else if(visible)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+		CheckUsing();
+        MoveHome();
+    }
+	Void CheckUsing()
+	{
+	if(Target.player.cmd.buttons&BT_USE)HoldUseKey++;
+	Else HoldUseKey=0;
+	}
+    override bool CheckVisible(Actor target)
+    {
+        let grenade = target.FindInventory('HDFragGrenadeAmmo');
+		let grenadethrower = HDGrenadeThrower(target.player.readyweapon);
+        return hdb_worntoggle>0 && grenade && hdb_wornammo>-1 && !grenadethrower;
+    }
+	override void MoveHome()
+    {
+        Vector3 offset;
+        if (pitch_affected)
+        {
+            double tp = min(75., target.pitch + pitch_offset);
+            offset = (AngleToVector(target.angle, abs(cos(tp))), -sin(tp)) * reach;
+        }
+        else
+        {
+            offset = (AngleToVector(target.angle), 0) * reach;
+        }
+        offset += AngleToVector(target.angle - 90., shift);
+		if(target.height<40)home = (target.pos.xy, target.player.viewz+20 - lower) + offset;
+        else home = (target.pos.xy, target.player.viewz - lower) + offset;
+        SetOrigin(home, true);
+    }
+    default
+    {
+        -FORCEXYBILLBOARD
+        HideousBubble.lower 30.;
+        HideousBubble.reach 3.;
+		HideousBubble.shift 6;
+        HideousBubble.pitch_affected false;
+		Bubble_WornGrenade.Grancount 1;
+		scale 0.3;
+    }
+
+    states
+    {
+    Spawn:
+        FRAG A 1 {if(target.player.crouching>=1) angle = target.angle; }
+        Wait;
+    }
+}
+
+class Bubble_WornGrenade2 : Bubble_WornGrenade
+{
+    override bool CheckVisible(Actor target)
+    {
+        let grenade = (target.CountInv('HDFragGrenadeAmmo')>=Grancount);
+        return hdb_worntoggle>0 && grenade && (hdb_wornammo>-1);
+    }
+    default
+    {
+        HideousBubble.lower 29.;
+        HideousBubble.reach 1.;
+		HideousBubble.shift 6.5;
+		Bubble_WornGrenade.Grancount 2;
+		}}
+class Bubble_WornGrenade3 : Bubble_WornGrenade2
+{
+    default
+    {
+        Bubble_WornGrenade.Grancount 3;
+		HideousBubble.lower 29.;
+        HideousBubble.reach -1.;
+		HideousBubble.shift 6.5;
+    }}	
+class Bubble_WornGrenade4 : Bubble_WornGrenade2
+{
+    default
+    {
+        Bubble_WornGrenade.Grancount 4;
+		HideousBubble.lower 30.;
+        HideousBubble.reach -3.;
+		HideousBubble.shift 6;
+    }}	
+class Bubble_WornGrenade5 : Bubble_WornGrenade4
+{
+    default
+    {
+        Bubble_WornGrenade.Grancount 5;
+		HideousBubble.lower 30.;
+        HideousBubble.reach 3.;
+		HideousBubble.shift -6;
+    }}	
+class Bubble_WornGrenade6 : Bubble_WornGrenade4
+{
+    default
+    {
+        Bubble_WornGrenade.Grancount 6;
+		HideousBubble.lower 29.;
+        HideousBubble.reach 1.;
+		HideousBubble.shift -6.5;
+    }}	
+class Bubble_WornGrenade7 : Bubble_WornGrenade4
+{
+    default
+    {
+        Bubble_WornGrenade.Grancount 7;
+		HideousBubble.lower 29.;
+        HideousBubble.reach -1.;
+		HideousBubble.shift -6.5;
+    }}		
+class Bubble_WornGrenade8 : Bubble_WornGrenade4
+{
+    default
+    {
+        Bubble_WornGrenade.Grancount 8;
+		HideousBubble.lower 30.;
+        HideousBubble.reach -3.;
+		HideousBubble.shift -6;
+    }}		
+
+class Bubble_WornShells : HideousBubble
+{
+	string WornExist;
+	string WornExist1;
+	string WornExist2;
+	string WornExist3;
+	string WornExist4;
+	string WornExist5;
+	int shellcounter;
+	property shellcounter:shellcounter;
+	String AddonWeap1;
+	String ShellType;
+	String ShellType2;
+	class<weapon> addwep1;
+	property addonweapon1:AddonWeap1;
+	property ShellType:ShellType;
+	property ShellType2:ShellType2;
+	
+	int HoldUseKey;
+	Void CheckUsing()
+	{
+	if(Target.player.cmd.buttons&BT_USE)HoldUseKey++;
+	Else HoldUseKey=0;
+	}
+    override bool CheckVisible(Actor target)
+    {
+		WornExist="Hunter";
+		WornExist1="Slayer";
+		WornExist2="Slayer";
+		WornExist3="Slayer";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		let wep = (target.findinventory("Hunter") == target.player.ReadyWeapon||target.findinventory("Slayer") == target.player.ReadyWeapon);
+		let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		if(addwep1)
+		{
+		return hdb_worntoggle>0 && ((hdb_wornammo==1&&(wep||Lastwep
+		||(target.findInventory("HDShellAmmo")&&(target.findinventory("HDRevolver") != target.player.ReadyWeapon&&target.findinventory("BossRifle") != target.player.ReadyWeapon&&target.findinventory("LiberatorRifle") != target.player.ReadyWeapon&&target.findinventory(addwep1) != target.player.ReadyWeapon))))||(hdb_wornammo==0&&(wep||
+		Lastwep||(HoldUseKey>=hudthreshold1&&Target.FindInventory(ShellType)))));
+		}
+		else
+		{
+		return hdb_worntoggle>0 && ((hdb_wornammo==1&&(wep||Lastwep
+		||(target.findInventory("HDShellAmmo")&&(target.findinventory("HDRevolver") != target.player.ReadyWeapon&&target.findinventory("BossRifle") != target.player.ReadyWeapon&&target.findinventory("LiberatorRifle") != target.player.ReadyWeapon))))||(hdb_wornammo==0&&(wep||
+		Lastwep||(HoldUseKey>=hudthreshold1&&Target.FindInventory(ShellType)))));
+		}
+    }
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible && target.GetRenderStyle() !=STYLE_Normal)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        else if(Shelltype||ShellType2){
+		if(visible&& target == players[consoleplayer].camera &&target.countinv(ShellType)+target.countinv(ShellType2)<shellcounter)A_SetRenderStyle(0.5, STYLE_Translucent);
+		else if(visible)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());}
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+
+        MoveHome();
+		CheckUsing();
+    }
+	override void MoveHome()
+    {
+        Vector3 offset;
+        if (pitch_affected)
+        {
+            double tp = min(75., target.pitch + pitch_offset);
+            offset = (AngleToVector(target.angle, abs(cos(tp))), -sin(tp)) * reach;
+        }
+        else
+        {
+            offset = (AngleToVector(target.angle), 0) * reach;
+        }
+        offset += AngleToVector(target.angle - 90., shift);
+		if(target.height<40)home = (target.pos.xy, target.pos.z+target.height+20 - lower) + offset;
+        else home = (target.pos.xy, target.pos.z+target.height - lower) + offset;
+        SetOrigin(home, true);
+    }
+	Override Void PostBeginPlay()
+	{
+		addwep1 = AddonWeap1;
+		Super.PostBeginPlay();
+	}
+    default
+    {
+		+YFLIP
+		+INTERPOLATEANGLES
+        +FLATSPRITE
+        +ROLLSPRITE
+        -FORCEXYBILLBOARD
+        HideousBubble.lower 25.;
+        HideousBubble.reach 2.;
+		HideousBubble.shift 0;
+        HideousBubble.pitch_affected false;
+		Scale 0.4;
+		Bubble_WornShells.shellcounter 1;
+    }
+
+    states
+    {
+    Spawn:
+		BSHL A 1{if(target.countinv("HDShellAmmo")<shellcounter) frame=4;
+				else if(target.countinv("HDShellAmmo")==shellcounter) frame=0;
+				else if(target.countinv("HDShellAmmo")==shellcounter+1) frame=1;
+				else if(target.countinv("HDShellAmmo")==shellcounter+2) frame=2;
+				else if(target.countinv("HDShellAmmo")>=shellcounter+3) frame=3;
+				
+				if(target.height>34){reach=2;lower=25;angle = target.angle; Pitch =-90;}
+				else if(target.height>20){reach=2;lower=27;angle = target.angle; Pitch =-90;}
+				else {angle = target.angle; Pitch = 0;lower=35;reach=0;}}
+        Wait;
+    }
+}
+class Bubble_WornShells1 : Bubble_WornShells
+{
+    default
+    {
+		Bubble_WornShells.shellcounter 1;
+		Bubble_WornShells.addonweapon1 "CarcanoRifle";
+		Bubble_WornShells.ShellType "HDShellAmmo";
+		Bubble_WornShells.ShellType2 "";
+    }
+}
+class Bubble_WornShells2 : Bubble_WornShells1
+{
+    default
+    {
+		HideousBubble.reach 0.;
+		HideousBubble.shift 5;
+		Bubble_WornShells.shellcounter 5;
+		+XFLIP
+    }
+
+    states
+    {
+    Spawn:
+        BSHL A 1 {if(target.countinv("HDShellAmmo")<shellcounter) frame=4;
+				else if(target.countinv("HDShellAmmo")==shellcounter) frame=0;
+				else if(target.countinv("HDShellAmmo")==shellcounter+1) frame=1;
+				else if(target.countinv("HDShellAmmo")==shellcounter+2) frame=2;
+				else if(target.countinv("HDShellAmmo")>=shellcounter+3) frame=3;
+					if(target.height>34){lower=25;Roll=0;angle = target.angle-45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;angle = target.angle-45; Pitch =-90;}
+					else {angle = target.angle-90; Roll=90; Pitch =-45; lower=33; reach=0;}}
+        Wait;
+    }
+}
+class Bubble_WornShells3 : Bubble_WornShells1
+{
+    default
+    {
+		HideousBubble.reach 0.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 9;
+    }
+
+    states
+    {
+    Spawn:
+        BSHL A 1 {if(target.countinv("HDShellAmmo")<shellcounter) frame=4;
+				else if(target.countinv("HDShellAmmo")==shellcounter) frame=0;
+				else if(target.countinv("HDShellAmmo")==shellcounter+1) frame=1;
+				else if(target.countinv("HDShellAmmo")==shellcounter+2) frame=2;
+				else if(target.countinv("HDShellAmmo")>=shellcounter+3) frame=3;
+				if(target.height>34){lower=25;Roll=0;angle = target.angle+45; Pitch =-90;}
+				else if(target.height>20){lower=27;Roll=0;angle = target.angle+45; Pitch =-90;}
+				else{angle = target.angle+90; Roll=-90; Pitch =-45; lower=33; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_WornShells4 : Bubble_WornShells1
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -4.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 13;
+    }
+
+    states
+    {
+    Spawn:
+        BSHL A 1 {if(target.countinv("HDShellAmmo")<shellcounter) frame=4;
+				else if(target.countinv("HDShellAmmo")==shellcounter) frame=0;
+				else if(target.countinv("HDShellAmmo")==shellcounter+1) frame=1;
+				else if(target.countinv("HDShellAmmo")==shellcounter+2) frame=2;
+				else if(target.countinv("HDShellAmmo")>=shellcounter+3) frame=3;
+					if(target.height>34){lower=25;Roll=0;Reach=-4;angle = target.angle-45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;Reach=-4;angle = target.angle-45; Pitch =-90;}
+					else{angle = target.angle-90; Roll=90; Pitch =-45; lower=29; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_WornShells5 : Bubble_WornShells1
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -6.;
+		HideousBubble.shift 0;
+		Bubble_WornShells.shellcounter 17;
+    }
+
+    states
+    {
+    Spawn:
+        BSHL A 1 {if(target.countinv("HDShellAmmo")<shellcounter) frame=4;
+				else if(target.countinv("HDShellAmmo")==shellcounter) frame=0;
+				else if(target.countinv("HDShellAmmo")==shellcounter+1) frame=1;
+				else if(target.countinv("HDShellAmmo")==shellcounter+2) frame=2;
+				else if(target.countinv("HDShellAmmo")>=shellcounter+3) frame=3;
+		if(target.height>34){lower=25; reach=-6;angle = target.angle; Pitch =-90;}
+		else if(target.height>20){lower=27; reach=-6;angle = target.angle; Pitch =-90;}
+		else{ angle = target.angle; Pitch =0; lower=26; reach=0; }}
+        Wait;
+    }
+}
+
+class Bubble_WornShells6 : Bubble_WornShells1
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -4.;
+		HideousBubble.shift 5;
+		Bubble_WornShells.shellcounter 21;
+    }
+
+    states
+    {
+    Spawn:
+        BSHL A 1 {if(target.countinv("HDShellAmmo")<shellcounter) frame=4;
+				else if(target.countinv("HDShellAmmo")==shellcounter) frame=0;
+				else if(target.countinv("HDShellAmmo")==shellcounter+1) frame=1;
+				else if(target.countinv("HDShellAmmo")==shellcounter+2) frame=2;
+				else if(target.countinv("HDShellAmmo")>=shellcounter+3) frame=3;
+					if(target.height>34){lower=25;Roll=0;Reach=-4;angle = target.angle+45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;Reach=-4;angle = target.angle+45; Pitch =-90;}
+					else{angle = target.angle+90; Roll=-90; Pitch =-45; lower=29; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn7mm : Bubble_WornShells
+{
+    override bool CheckVisible(Actor target)
+    {
+		WornExist="BossRifle";
+		WornExist1="BossRifle";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		let wep = target.findinventory("BossRifle") == target.player.ReadyWeapon;
+		let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		return hdb_worntoggle>0 && ((hdb_wornammo==1&&(wep||Lastwep||(target.findInventory("SevenMilAmmo")&&(target.findinventory("HDRevolver") != target.player.ReadyWeapon&&target.findinventory("Hunter") != target.player.ReadyWeapon&&target.findinventory("Slayer") != target.player.ReadyWeapon))))||(hdb_wornammo==0&&(wep||Lastwep
+		||(HoldUseKey>=hudthreshold1&&Target.FindInventory(ShellType)))));
+    }
+	Default{Bubble_WornShells.ShellType "SevenMilAmmo";}
+    states
+    {
+    Spawn:
+		CSHL A 1{if(target.countinv("SevenMilAmmo")<shellcounter) frame=7;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter&&target.countinv("SevenMilAmmo")<shellcounter+2) frame=0;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+2&&target.countinv("SevenMilAmmo")<shellcounter+4) frame=1;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+4&&target.countinv("SevenMilAmmo")<shellcounter+6) frame=2;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+6&&target.countinv("SevenMilAmmo")<shellcounter+8) frame=3;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+8&&target.countinv("SevenMilAmmo")<shellcounter+10) frame=4;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+10&&target.countinv("SevenMilAmmo")<shellcounter+12) frame=5;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+12) frame=6;
+				
+				if(target.height>34){reach=2;lower=25;angle = target.angle; Pitch =-90;}
+				else if(target.height>20){reach=2;lower=27;angle = target.angle; Pitch =-90;}
+				else {angle = target.angle; Pitch = 0;lower=35;reach=0;}}
+        Wait;
+    }
+}
+class Bubble_Worn7mm2 : Bubble_Worn7mm
+{
+    default
+    {
+		HideousBubble.reach 0.;
+		HideousBubble.shift 5;
+		Bubble_WornShells.shellcounter 14;
+		+XFLIP
+    }
+
+    states
+    {
+    Spawn:
+        CSHL A 1{if(target.countinv("SevenMilAmmo")<shellcounter) frame=7;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter&&target.countinv("SevenMilAmmo")<shellcounter+2) frame=0;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+2&&target.countinv("SevenMilAmmo")<shellcounter+4) frame=1;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+4&&target.countinv("SevenMilAmmo")<shellcounter+6) frame=2;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+6&&target.countinv("SevenMilAmmo")<shellcounter+8) frame=3;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+8&&target.countinv("SevenMilAmmo")<shellcounter+10) frame=4;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+10&&target.countinv("SevenMilAmmo")<shellcounter+12) frame=5;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+12) frame=6;
+				
+					if(target.height>34){lower=25;Roll=0;angle = target.angle-45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;angle = target.angle-45; Pitch =-90;}
+					else {angle = target.angle-90; Roll=90; Pitch =-45; lower=33; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn7mm3 : Bubble_Worn7mm
+{
+    default
+    {
+		HideousBubble.reach 0.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 27;
+    }
+
+    states
+    {
+    Spawn:
+        CSHL A 1{if(target.countinv("SevenMilAmmo")<shellcounter) frame=7;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter&&target.countinv("SevenMilAmmo")<shellcounter+2) frame=0;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+2&&target.countinv("SevenMilAmmo")<shellcounter+4) frame=1;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+4&&target.countinv("SevenMilAmmo")<shellcounter+6) frame=2;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+6&&target.countinv("SevenMilAmmo")<shellcounter+8) frame=3;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+8&&target.countinv("SevenMilAmmo")<shellcounter+10) frame=4;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+10&&target.countinv("SevenMilAmmo")<shellcounter+12) frame=5;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+12) frame=6;
+				
+				if(target.height>34){lower=25;Roll=0;angle = target.angle+45; Pitch =-90;}
+				else if(target.height>20){lower=27;Roll=0;angle = target.angle+45; Pitch =-90;}
+				else{angle = target.angle+90; Roll=-90; Pitch =-45; lower=33; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn7mm4 : Bubble_Worn7mm
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -4.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 40;
+    }
+
+    states
+    {
+    Spawn:
+        CSHL A 1{if(target.countinv("SevenMilAmmo")<shellcounter) frame=7;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter&&target.countinv("SevenMilAmmo")<shellcounter+2) frame=0;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+2&&target.countinv("SevenMilAmmo")<shellcounter+4) frame=1;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+4&&target.countinv("SevenMilAmmo")<shellcounter+6) frame=2;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+6&&target.countinv("SevenMilAmmo")<shellcounter+8) frame=3;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+8&&target.countinv("SevenMilAmmo")<shellcounter+10) frame=4;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+10&&target.countinv("SevenMilAmmo")<shellcounter+12) frame=5;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+12) frame=6;
+				
+					if(target.height>34){lower=25;Roll=0;Reach=-4;angle = target.angle-45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;Reach=-4;angle = target.angle-45; Pitch =-90;}
+					else{angle = target.angle-90; Roll=90; Pitch =-45; lower=29; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn7mm5 : Bubble_Worn7mm
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -6.;
+		HideousBubble.shift 0;
+		Bubble_WornShells.shellcounter 53;
+    }
+
+    states
+    {
+    Spawn:
+        CSHL A 1{if(target.countinv("SevenMilAmmo")<shellcounter) frame=7;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter&&target.countinv("SevenMilAmmo")<shellcounter+2) frame=0;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+2&&target.countinv("SevenMilAmmo")<shellcounter+4) frame=1;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+4&&target.countinv("SevenMilAmmo")<shellcounter+6) frame=2;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+6&&target.countinv("SevenMilAmmo")<shellcounter+8) frame=3;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+8&&target.countinv("SevenMilAmmo")<shellcounter+10) frame=4;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+10&&target.countinv("SevenMilAmmo")<shellcounter+12) frame=5;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+12) frame=6;
+				
+		if(target.height>34){lower=25; reach=-6;angle = target.angle; Pitch =-90;}
+		else if(target.height>20){lower=27; reach=-6;angle = target.angle; Pitch =-90;}
+		else{ angle = target.angle; Pitch =0; lower=26; reach=0; }}
+        Wait;
+    }
+}
+
+class Bubble_Worn7mm6 : Bubble_Worn7mm
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -4.;
+		HideousBubble.shift 5;
+		Bubble_WornShells.shellcounter 66;
+    }
+
+    states
+    {
+    Spawn:
+        CSHL A 1{if(target.countinv("SevenMilAmmo")<shellcounter) frame=7;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter&&target.countinv("SevenMilAmmo")<shellcounter+2) frame=0;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+2&&target.countinv("SevenMilAmmo")<shellcounter+4) frame=1;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+4&&target.countinv("SevenMilAmmo")<shellcounter+6) frame=2;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+6&&target.countinv("SevenMilAmmo")<shellcounter+8) frame=3;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+8&&target.countinv("SevenMilAmmo")<shellcounter+10) frame=4;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+10&&target.countinv("SevenMilAmmo")<shellcounter+12) frame=5;
+				else if(target.countinv("SevenMilAmmo")>=shellcounter+12) frame=6;
+				
+					if(target.height>34){lower=25;Roll=0;Reach=-4;angle = target.angle+45; Pitch =-90;}
+					else if(target.height>20){lower=27; reach=-4;angle = target.angle+45; Pitch =-90;}
+					else{angle = target.angle+90; Roll=-90; Pitch =-45; lower=29; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn9mm : Bubble_WornShells
+{
+    override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		let wep = target.findinventory("HDRevolver") == target.player.ReadyWeapon;
+		WornExist="HDRevolver";
+		WornExist1="HDRevolver";
+		let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		if(addwep1)
+		{
+		return hdb_worntoggle>0 && ((hdb_wornammo==1&&(wep||Lastwep||((target.findInventory("HDPistolAmmo")||target.findInventory("HDRevolverAmmo"))&&
+		(target.findinventory("Hunter") != target.player.ReadyWeapon&&target.findinventory("Slayer") != target.player.ReadyWeapon&&target.findinventory("BossRifle") != target.player.ReadyWeapon&&target.findinventory("LiberatorRifle") != target.player.ReadyWeapon&&target.findinventory(addwep1) != target.player.ReadyWeapon))))||
+		(hdb_wornammo==0&&(wep||Lastwep||(HoldUseKey>=hudthreshold1&&(Target.FindInventory(ShellType)||Target.FindInventory(ShellType2))))));
+		}
+		else
+		{
+		return hdb_worntoggle>0 &&  ((hdb_wornammo==1&&(wep||Lastwep||((target.findInventory("HDPistolAmmo")||target.findInventory("HDRevolverAmmo"))&&(target.findinventory("Hunter") != target.player.ReadyWeapon&&target.findinventory("Slayer") != target.player.ReadyWeapon&&target.findinventory("BossRifle") != target.player.ReadyWeapon&&target.findinventory("LiberatorRifle") != target.player.ReadyWeapon))))||
+		(hdb_wornammo==0&&(wep||Lastwep||(HoldUseKey>=hudthreshold1&&(Target.FindInventory(ShellType)||Target.FindInventory(ShellType2))))));
+		}
+	}
+	Default{Bubble_WornShells.ShellType "HDPistolAmmo";Bubble_WornShells.ShellType2 "HDRevolverAmmo";}
+    states
+    {
+    Spawn:
+        9SHL A 1{if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter) frame=7;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+2) frame=0;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+2&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+4) frame=1;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+4&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+6) frame=2;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+6&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+8) frame=3;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+8&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+10) frame=4;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+10&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+12) frame=5;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+12) frame=6;
+				
+				if(target.height>34){reach=2;lower=25;angle = target.angle; Pitch =-90;}
+				else if(target.height>20){reach=2;lower=27;angle = target.angle; Pitch =-90;}
+				else {angle = target.angle; Pitch = 0;lower=35;reach=0;}}
+        Wait;
+    }
+}
+class Bubble_Worn9mm2 : Bubble_Worn9mm
+{
+    default
+    {
+		HideousBubble.reach 0.;
+		HideousBubble.shift 5;
+		Bubble_WornShells.shellcounter 14;
+		+XFLIP
+    }
+
+    states
+    {
+    Spawn:
+        9SHL A 1{if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter) frame=7;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+2) frame=0;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+2&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+4) frame=1;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+4&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+6) frame=2;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+6&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+8) frame=3;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+8&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+10) frame=4;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+10&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+12) frame=5;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+12) frame=6;
+				
+					if(target.height>34){lower=25;Roll=0;angle = target.angle-45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;angle = target.angle-45; Pitch =-90;}
+					else {angle = target.angle-90; Roll=90; Pitch =-45; lower=33; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn9mm3 : Bubble_Worn9mm
+{
+    default
+    {
+		HideousBubble.reach 0.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 27;
+    }
+
+    states
+    {
+    Spawn:
+        9SHL A 1{if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter) frame=7;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+2) frame=0;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+2&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+4) frame=1;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+4&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+6) frame=2;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+6&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+8) frame=3;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+8&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+10) frame=4;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+10&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+12) frame=5;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+12) frame=6;
+				
+				if(target.height>34){lower=25;Roll=0;angle = target.angle+45; Pitch =-90;}
+				else if(target.height>20){lower=27;Roll=0;angle = target.angle+45; Pitch =-90;}
+				else{angle = target.angle+90; Roll=-90; Pitch =-45; lower=33; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn9mm4 : Bubble_Worn9mm
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -4.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 40;
+    }
+
+    states
+    {
+    Spawn:
+        9SHL A 1{if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter) frame=7;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+2) frame=0;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+2&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+4) frame=1;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+4&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+6) frame=2;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+6&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+8) frame=3;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+8&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+10) frame=4;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+10&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+12) frame=5;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+12) frame=6;
+				
+					if(target.height>34){lower=25;Roll=0;Reach=-4;angle = target.angle-45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;Reach=-4;angle = target.angle-45; Pitch =-90;}
+					else{angle = target.angle-90; Roll=90; Pitch =-45; lower=29; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn9mm5 : Bubble_Worn9mm
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -6.;
+		HideousBubble.shift 0;
+		Bubble_WornShells.shellcounter 53;
+    }
+
+    states
+    {
+    Spawn:
+        9SHL A 1{if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter) frame=7;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+2) frame=0;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+2&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+4) frame=1;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+4&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+6) frame=2;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+6&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+8) frame=3;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+8&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+10) frame=4;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+10&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+12) frame=5;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+12) frame=6;
+				
+		if(target.height>34){lower=25; reach=-6;angle = target.angle; Pitch =-90;}
+		else if(target.height>20){lower=27; reach=-6;angle = target.angle; Pitch =-90;}
+		else{ angle = target.angle; Pitch =0; lower=26; reach=0; }}
+        Wait;
+    }
+}
+
+class Bubble_Worn9mm6 : Bubble_Worn9mm
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -4.;
+		HideousBubble.shift 5;
+		Bubble_WornShells.shellcounter 66;
+    }
+
+    states
+    {
+    Spawn:
+        9SHL A 1{if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter) frame=7;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+2) frame=0;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+2&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+4) frame=1;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+4&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+6) frame=2;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+6&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+8) frame=3;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+8&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+10) frame=4;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+10&&(target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))<shellcounter+12) frame=5;
+				else if((target.countinv("HDPistolAmmo")+target.countinv("HDRevolverAmmo"))>=shellcounter+12) frame=6;
+				
+					if(target.height>34){lower=25;Roll=0;Reach=-4;angle = target.angle+45; Pitch =-90;}
+					else if(target.height>20){lower=27; reach=-4;angle = target.angle+45; Pitch =-90;}
+					else{angle = target.angle+90; Roll=-90; Pitch =-45; lower=29; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_WornCarcano : Bubble_WornShells
+{
+	String clssname;
+	String wepclss;
+	class<Inventory> cls;
+	class<Weapon> wepcls;
+	Override Void PostBeginPlay()
+	{
+		clssname = "HDCarcanoAmmo";
+		wepclss = "CarcanoRifle";
+		WornExist="CarcanoRifle";
+		WornExist1="CarcanoRifle";
+		cls = clssname;
+		wepcls = wepclss;
+		Super.PostBeginPlay();
+	}
+    override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		if(cls&&wepcls){
+		let wep = target.findinventory(wepcls) == target.player.ReadyWeapon;
+		let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		return hdb_worntoggle>0 && ((hdb_wornammo==1&&(wep||Lastwep||(target.findInventory(cls)&&(target.findinventory("HDRevolver") != target.player.ReadyWeapon&&target.findinventory("Hunter") != target.player.ReadyWeapon&&target.findinventory("Slayer") != target.player.ReadyWeapon&&target.CountInv("SevenMilAmmo")<shellcounter))))||(hdb_wornammo==0&&(wep||Lastwep||(HoldUseKey>=hudthreshold1&&Target.FindInventory(ShellType)))));
+		}
+		return false;
+	}
+	default
+    {
+		Bubble_WornShells.shellcounter 1;
+		Bubble_WornShells.addonweapon1 "CarcanoRifle";
+		Bubble_WornShells.ShellType "HDCarcanoAmmo";
+		Bubble_WornShells.ShellType2 "";
+    }
+    states
+    {
+    Spawn:
+		ZSHL A 1{if(target.countinv(cls)<shellcounter) frame=7;
+				else if(target.countinv(cls)>=shellcounter&&target.countinv(cls)<shellcounter+2) frame=0;
+				else if(target.countinv(cls)>=shellcounter+2&&target.countinv(cls)<shellcounter+4) frame=1;
+				else if(target.countinv(cls)>=shellcounter+4&&target.countinv(cls)<shellcounter+6) frame=2;
+				else if(target.countinv(cls)>=shellcounter+6&&target.countinv(cls)<shellcounter+8) frame=3;
+				else if(target.countinv(cls)>=shellcounter+8&&target.countinv(cls)<shellcounter+10) frame=4;
+				else if(target.countinv(cls)>=shellcounter+10&&target.countinv(cls)<shellcounter+12) frame=5;
+				else if(target.countinv(cls)>=shellcounter+12) frame=6;
+				
+				if(target.height>34){reach=2;lower=25;angle = target.angle; Pitch =-90;}
+				else if(target.height>20){reach=2;lower=27;angle = target.angle; Pitch =-90;}
+				else {angle = target.angle; Pitch = 0;lower=35;reach=0;}}
+        Wait;
+    }
+}
+class Bubble_WornCarcano2 : Bubble_WornCarcano
+{
+    default
+    {
+		HideousBubble.reach 0.;
+		HideousBubble.shift 5;
+		Bubble_WornShells.shellcounter 14;
+		+XFLIP
+    }
+
+    states
+    {
+    Spawn:
+		ZSHL A 1{if(target.countinv(cls)<shellcounter) frame=7;
+				else if(target.countinv(cls)>=shellcounter&&target.countinv(cls)<shellcounter+2) frame=0;
+				else if(target.countinv(cls)>=shellcounter+2&&target.countinv(cls)<shellcounter+4) frame=1;
+				else if(target.countinv(cls)>=shellcounter+4&&target.countinv(cls)<shellcounter+6) frame=2;
+				else if(target.countinv(cls)>=shellcounter+6&&target.countinv(cls)<shellcounter+8) frame=3;
+				else if(target.countinv(cls)>=shellcounter+8&&target.countinv(cls)<shellcounter+10) frame=4;
+				else if(target.countinv(cls)>=shellcounter+10&&target.countinv(cls)<shellcounter+12) frame=5;
+				else if(target.countinv(cls)>=shellcounter+12) frame=6;
+				
+					if(target.height>34){lower=25;Roll=0;angle = target.angle-45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;angle = target.angle-45; Pitch =-90;}
+					else {angle = target.angle-90; Roll=90; Pitch =-45; lower=33; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_WornCarcano3 : Bubble_WornCarcano
+{
+    default
+    {
+		HideousBubble.reach 0.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 27;
+    }
+
+    states
+    {
+    Spawn:
+		ZSHL A 1{if(target.countinv(cls)<shellcounter) frame=7;
+				else if(target.countinv(cls)>=shellcounter&&target.countinv(cls)<shellcounter+2) frame=0;
+				else if(target.countinv(cls)>=shellcounter+2&&target.countinv(cls)<shellcounter+4) frame=1;
+				else if(target.countinv(cls)>=shellcounter+4&&target.countinv(cls)<shellcounter+6) frame=2;
+				else if(target.countinv(cls)>=shellcounter+6&&target.countinv(cls)<shellcounter+8) frame=3;
+				else if(target.countinv(cls)>=shellcounter+8&&target.countinv(cls)<shellcounter+10) frame=4;
+				else if(target.countinv(cls)>=shellcounter+10&&target.countinv(cls)<shellcounter+12) frame=5;
+				else if(target.countinv(cls)>=shellcounter+12) frame=6;
+				
+				if(target.height>34){lower=25;Roll=0;angle = target.angle+45; Pitch =-90;}
+				else if(target.height>20){lower=27;Roll=0;angle = target.angle+45; Pitch =-90;}
+				else{angle = target.angle+90; Roll=-90; Pitch =-45; lower=33; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_WornCarcano4 : Bubble_WornCarcano
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -4.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 40;
+    }
+
+    states
+    {
+    Spawn:
+		ZSHL A 1{if(target.countinv(cls)<shellcounter) frame=7;
+				else if(target.countinv(cls)>=shellcounter&&target.countinv(cls)<shellcounter+2) frame=0;
+				else if(target.countinv(cls)>=shellcounter+2&&target.countinv(cls)<shellcounter+4) frame=1;
+				else if(target.countinv(cls)>=shellcounter+4&&target.countinv(cls)<shellcounter+6) frame=2;
+				else if(target.countinv(cls)>=shellcounter+6&&target.countinv(cls)<shellcounter+8) frame=3;
+				else if(target.countinv(cls)>=shellcounter+8&&target.countinv(cls)<shellcounter+10) frame=4;
+				else if(target.countinv(cls)>=shellcounter+10&&target.countinv(cls)<shellcounter+12) frame=5;
+				else if(target.countinv(cls)>=shellcounter+12) frame=6;
+				
+					if(target.height>34){lower=25;Roll=0;Reach=-4;angle = target.angle-45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;Reach=-4;angle = target.angle-45; Pitch =-90;}
+					else{angle = target.angle-90; Roll=90; Pitch =-45; lower=29; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_WornCarcano5 : Bubble_WornCarcano
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -6.;
+		HideousBubble.shift 0;
+		Bubble_WornShells.shellcounter 53;
+    }
+
+    states
+    {
+    Spawn:
+		ZSHL A 1{if(target.countinv(cls)<shellcounter) frame=7;
+				else if(target.countinv(cls)>=shellcounter&&target.countinv(cls)<shellcounter+2) frame=0;
+				else if(target.countinv(cls)>=shellcounter+2&&target.countinv(cls)<shellcounter+4) frame=1;
+				else if(target.countinv(cls)>=shellcounter+4&&target.countinv(cls)<shellcounter+6) frame=2;
+				else if(target.countinv(cls)>=shellcounter+6&&target.countinv(cls)<shellcounter+8) frame=3;
+				else if(target.countinv(cls)>=shellcounter+8&&target.countinv(cls)<shellcounter+10) frame=4;
+				else if(target.countinv(cls)>=shellcounter+10&&target.countinv(cls)<shellcounter+12) frame=5;
+				else if(target.countinv(cls)>=shellcounter+12) frame=6;
+				
+		if(target.height>34){lower=25; reach=-6;angle = target.angle; Pitch =-90;}
+		else if(target.height>20){lower=27; reach=-6;angle = target.angle; Pitch =-90;}
+		else{ angle = target.angle; Pitch =0; lower=26; reach=0; }}
+        Wait;
+    }
+}
+
+class Bubble_WornCarcano6 : Bubble_WornCarcano
+{
+    default
+    {
+		+XFLIP
+		HideousBubble.reach -4.;
+		HideousBubble.shift 5;
+		Bubble_WornShells.shellcounter 66;
+    }
+
+    states
+    {
+    Spawn:
+		ZSHL A 1{if(target.countinv(cls)<shellcounter) frame=7;
+				else if(target.countinv(cls)>=shellcounter&&target.countinv(cls)<shellcounter+2) frame=0;
+				else if(target.countinv(cls)>=shellcounter+2&&target.countinv(cls)<shellcounter+4) frame=1;
+				else if(target.countinv(cls)>=shellcounter+4&&target.countinv(cls)<shellcounter+6) frame=2;
+				else if(target.countinv(cls)>=shellcounter+6&&target.countinv(cls)<shellcounter+8) frame=3;
+				else if(target.countinv(cls)>=shellcounter+8&&target.countinv(cls)<shellcounter+10) frame=4;
+				else if(target.countinv(cls)>=shellcounter+10&&target.countinv(cls)<shellcounter+12) frame=5;
+				else if(target.countinv(cls)>=shellcounter+12) frame=6;
+				
+					if(target.height>34){lower=25;Roll=0;Reach=-4;angle = target.angle+45; Pitch =-90;}
+					else if(target.height>20){lower=27;Roll=0;Reach=-4;angle = target.angle+45; Pitch =-90;}
+					else{angle = target.angle+90; Roll=-90; Pitch =-45; lower=29; reach=0;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn4Mag : Bubble_WornShells
+{
+    override bool CheckVisible(Actor target)
+    {
+		WornExist="ZM66AssaultRifle";
+		WornExist1="Vulcanette";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		class<actor> MagType = ShellType;
+		let MagInManager = (Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType&&Shellcounter!=1);
+		let wep = ((target.FindInventory("ZM66AssaultRifle") == target.player.ReadyWeapon)||(target.FindInventory("Vulcanette") == target.player.ReadyWeapon)||(target.FindInventory("HERPUsable") == target.player.ReadyWeapon));
+        let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		return hdb_worntoggle>0 && target.CountInv("HD4mMag")>=ShellCounter /*&& target == players[consoleplayer].camera*/ && ((hdb_wornammo==1&&target.CountInv("HD7mMag")<ShellCounter)||
+		hdb_wornammo>-1&&((wep||Lastwep)||MagInManager||(HoldUseKey>=hudthreshold1&&!(Shellcounter==1&&Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType))));
+    }
+	override void Tick()
+    {
+        if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
+
+        if (CheckVisible(target) != visible) SetVisible(!visible);
+        if (bDestroyed) return;
+        if (visible && target.GetRenderStyle() !=STYLE_Add)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
+        else if(Shelltype||ShellType2){
+		if(visible&&target.countinv(ShellType)+target.countinv(ShellType2)<shellcounter)A_SetRenderStyle(0.5, STYLE_Translucent);
+		else if(visible)A_SetRenderStyle(Target.alpha, STYLE_Translucent);}
+        if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
+
+        MoveHome();
+		CheckUsing();
+    }
+    default
+    {
+		-YFLIP
+		+FLATSPRITE
+		HideousBubble.Pitch_Affected false;
+		HideousBubble.lower 17.;
+		HideousBubble.reach 2.;
+		HideousBubble.shift 3;
+		Bubble_WornShells.shellcounter 1;
+		Bubble_WornShells.ShellType "HD4mMag";
+		Scale 0.7;
+    }
+
+    states
+    {
+    Spawn:
+        ZMAG A 1{angle=target.angle;
+		let thisMag = HDMagAmmo(target.findInventory("HD4mMag"));
+		let mag = HDMagAmmo(target.findInventory("HD4mMag"));
+		int curmag = mag.mags[mag.mags.size()-shellcounter];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+            CopySprite(magsprite);
+			
+			if(frame==2)roll=90;
+			else {roll=0;
+			if(curmag<46&&hdb_wornmags>0){
+			if(curmag<6)frame=3;
+			else if(curmag<11)frame=4;
+			else frame=curmag/5+3;}
+			}
+			if(target.height>34){pitch=-90;lower=default.lower;}
+			else if(target.height>20){pitch=-60;lower=default.lower+13;}
+			else {pitch=0;lower=34;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn4Mag2 : Bubble_Worn4Mag
+{
+    default
+    {
+		HideousBubble.shift -3;
+		Bubble_WornShells.shellcounter 2;
+    }
+}
+
+class Bubble_Worn4Mag3 : Bubble_Worn4Mag
+{
+	
+    default
+    {
+		HideousBubble.lower 18.;
+		HideousBubble.reach 3;
+		HideousBubble.shift 3;
+		Bubble_WornShells.shellcounter 3;
+    }
+}
+
+class Bubble_Worn4Mag4 : Bubble_Worn4Mag3
+{
+    default
+    {
+		HideousBubble.shift -3;
+		Bubble_WornShells.shellcounter 4;
+    }
+}
+class Bubble_Worn4Mag5 : Bubble_Worn4Mag
+{
+    default
+    {
+		HideousBubble.shift 1;
+		Bubble_WornShells.shellcounter 5;
+    }
+}
+class Bubble_Worn4Mag6 : Bubble_Worn4Mag2
+{
+    default
+    {
+		HideousBubble.shift -1;
+		Bubble_WornShells.shellcounter 6;
+    }
+}
+class Bubble_Worn4Mag7 : Bubble_Worn4Mag3
+{
+    default
+    {
+		HideousBubble.shift 1;
+		Bubble_WornShells.shellcounter 7;
+    }
+}
+class Bubble_Worn4Mag8 : Bubble_Worn4Mag4
+{
+    default
+    {
+		HideousBubble.shift -1;
+		Bubble_WornShells.shellcounter 8;
+    }
+}
+class Bubble_Worn7Mag : Bubble_Worn4Mag
+{
+	
+	override bool CheckVisible(Actor target)
+    {
+		WornExist="LiberatorRifle";
+		WornExist1="LiberatorRifle";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		class<actor> MagType = ShellType;
+		let MagInManager = (Target.findinventory("MagManager")==target.player.readyweapon/*&&MagManager(target.player.readyweapon).thismagtype==MagType&&Shellcounter!=1*/);
+		let wep = (target.FindInventory("LiberatorRifle") == target.player.ReadyWeapon);
+        let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		return hdb_worntoggle>0 && target.CountInv("HD7mMag")>=ShellCounter && target == players[consoleplayer].camera && ((hdb_wornammo==1&&target.CountInv("HD4mMag")<ShellCounter||
+		(hdb_wornammo==1&&target.FindInventory("ZM66AssaultRifle") != target.player.ReadyWeapon&&target.FindInventory("Vulcanette") != target.player.ReadyWeapon&&target.FindInventory("HERPUsable") != target.player.ReadyWeapon))||
+		(hdb_wornammo==0&&(wep||Lastwep||MagInManager||(HoldUseKey>=hudthreshold1&&!(Shellcounter==1&&Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType)))));
+    }
+    default
+    {
+		Scale 0.7;
+		HideousBubble.Shift 4;
+		Bubble_WornShells.ShellType "HD7mMag";
+		Bubble_WornShells.shellcounter 1;
+    }
+
+    states
+    {
+    Spawn:
+        RMAG # 1{angle=target.angle;pitch=-90;
+		let thisMag = HDMagAmmo(target.findInventory(ShellType));
+		let mag = HDMagAmmo(target.findInventory(ShellType));
+		if(target.countinv(ShellType)>=ShellCounter){
+		int curmag = mag.mags[mag.mags.size()-ShellCounter]%100;
+		if(curmag>0){Roll=0;
+			//A_Log(String.format("%i",mag.mags[mag.mags.size()-ShellCounter]));
+			if(curmag>28||(hdb_wornmags<1&&curmag>0))frame=0;
+			else{
+			if(curmag<=2)frame=3;
+			else if(curmag<25)frame=curmag/1.5+3;
+			else if(curmag<27)frame=20;
+			else frame=21;}}
+		else {Frame=1;Roll=90;}}
+			if(target.height>34){pitch=-90;lower=default.lower;}
+			else if(target.height>20){pitch=-60;lower=default.lower+13;}
+			else {pitch=0;lower=34;}}
+        Wait;
+    }
+}
+
+class Bubble_Worn7Mag2 : Bubble_Worn7Mag
+{
+    default
+    {
+		HideousBubble.shift -4;
+		Bubble_WornShells.shellcounter 2;
+    }
+}
+
+class Bubble_Worn7Mag3 : Bubble_Worn7Mag
+{
+    default
+    {
+		HideousBubble.lower 19.;
+		HideousBubble.reach 3;
+		HideousBubble.shift 4;
+		Bubble_WornShells.shellcounter 3;
+    }
+}
+
+class Bubble_Worn7Mag4 : Bubble_Worn7Mag3
+{
+    default
+    {
+		HideousBubble.shift -4;
+		Bubble_WornShells.shellcounter 4;
+    }
+}
+
+class Bubble_Worn7Mag5 : Bubble_Worn7Mag
+{
+    default
+    {
+		HideousBubble.reach 2.5;
+		HideousBubble.shift 1;
+		Bubble_WornShells.shellcounter 5;
+    }
+}
+class Bubble_Worn7Mag6 : Bubble_Worn7Mag
+{
+    default
+    {
+		HideousBubble.reach 2.5;
+		HideousBubble.shift -1;
+		Bubble_WornShells.shellcounter 6;
+    }
+}
+class Bubble_Worn7Mag7 : Bubble_Worn7Mag3
+{
+    default
+    {
+		HideousBubble.reach 3.5;
+		HideousBubble.shift 1;
+		Bubble_WornShells.shellcounter 7;
+    }
+}
+class Bubble_Worn7Mag8 : Bubble_Worn7Mag3
+{
+    default
+    {
+		HideousBubble.reach 3.5;
+		HideousBubble.shift -1;
+		Bubble_WornShells.shellcounter 8;
+    }
+}
+
+class Bubble_Worn9Mag15 : Bubble_Worn4Mag
+{
+	
+	override bool CheckVisible(Actor target)
+    {
+		WornExist="HDPistol";
+		WornExist1="DERPUsable";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		class<actor> MagType = ShellType;
+		let MagInManager = (Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType&&Shellcounter!=1);
+		let wep = (target.FindInventory(WornExist) == target.player.ReadyWeapon||target.FindInventory(WornExist1) == target.player.ReadyWeapon);
+        let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		return hdb_worntoggle>0 && target.CountInv("HD9mMag15")>=ShellCounter /*&& target == players[consoleplayer].camera*/ && ((hdb_wornammo==1&&target.CountInv("HD9mMag30")<ShellCounter)||
+		(hdb_wornammo>-1&&(wep||MagInManager||Lastwep||(HoldUseKey>=hudthreshold1&&!(Shellcounter==1&&Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType)))));
+    }
+    default
+    {
+		HideousBubble.lower 17.;
+		HideousBubble.reach 2.;
+		HideousBubble.shift 3;
+		Bubble_WornShells.ShellType "HD9mMag15";
+		Bubble_WornShells.shellcounter 1;
+    }
+    states
+    {
+    Spawn:
+        CLP2 A 1{angle=target.angle;pitch=-90;
+		let thisMag = HDMagAmmo(target.findInventory("HD9mMag15"));
+		let mag = HDMagAmmo(target.findInventory("HD9mMag15"));
+		int curmag = mag.mags[mag.mags.size()-ShellCounter];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(MagSprite=="CLP2NORM"){Roll=0;
+			if(curmag>13||(hdb_wornmags<1&&curmag>0))frame=0;
+			else{
+			if(curmag<2)frame=3;
+			else if(curmag<3)frame=4;
+			else if(curmag<9)frame=curmag+2;
+			else if(curmag<11)frame=11;
+			else frame=12;}}
+		else {Frame=1;Roll=90;}
+		if(target.height>34){pitch=-90;lower=default.lower;}
+			else if(target.height>20){pitch=-60;lower=default.lower+13;}
+			else {pitch=0;lower=34;}}
+        Wait;
+    }
+}
+class Bubble_Worn9Mag15_2 : Bubble_Worn9Mag15
+{
+    default
+    {
+		HideousBubble.shift -3;
+		Bubble_WornShells.ShellCounter 2;
+    }
+}
+class Bubble_Worn9Mag15_3 : Bubble_Worn9Mag15
+{
+    default
+    {
+		HideousBubble.lower 22.;
+		HideousBubble.reach 2;
+		HideousBubble.shift 3;
+		Bubble_WornShells.ShellCounter 3;
+    }
+	/*states
+    {
+    Spawn:
+        CLP2 A 1{angle=target.angle;pitch=-90;
+		let thisMag = HDMagAmmo(target.findInventory("HD9mMag15"));
+		let mag = HDMagAmmo(target.findInventory("HD9mMag15"));
+		int curmag = mag.mags[mag.mags.size()-ShellCounter];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(MagSprite=="CLP2NORM"){Roll=0;
+			if(curmag>13)frame=0;
+			else{
+			if(curmag<2)frame=3;
+			else if(curmag<4)frame=4;
+			else frame=curmag+3;}}
+		else {Frame=1;Roll=90;}
+		if(target.height>34){pitch=-90;lower=22;}
+			else if(target.height>20){pitch=-60;lower=35;}
+			else {pitch=0;lower=34;}}
+        Wait;
+    }*/
+}
+class Bubble_Worn9Mag15_4 : Bubble_Worn9Mag15_3
+{
+    default
+    {
+		HideousBubble.shift -3;
+		Bubble_WornShells.ShellCounter 4;
+    }
+}
+class Bubble_Worn9Mag15_5 : Bubble_Worn9Mag15
+{
+    default
+    {
+		HideousBubble.shift 1;
+		Bubble_WornShells.ShellCounter 5;
+    }
+}
+class Bubble_Worn9Mag15_6 : Bubble_Worn9Mag15
+{
+    default
+    {
+		HideousBubble.shift -1;
+		Bubble_WornShells.ShellCounter 6;
+    }
+}
+class Bubble_Worn9Mag15_7 : Bubble_Worn9Mag15_3
+{
+    default
+    {
+		HideousBubble.shift 1;
+		Bubble_WornShells.ShellCounter 7;
+    }
+}
+class Bubble_Worn9Mag15_8 : Bubble_Worn9Mag15_3
+{
+    default
+    {
+		HideousBubble.shift -1;
+		Bubble_WornShells.ShellCounter 8;
+    }
+}
+
+class Bubble_Worn9Mag30 : Bubble_Worn4Mag
+{
+	
+	override bool CheckVisible(Actor target)
+    {
+		WornExist="HDSMG";
+		WornExist1="HDSMG";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		class<actor> MagType = ShellType;
+		let MagInManager = (Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType&&Shellcounter!=1);
+		let wep = target.FindInventory("HDSMG") == target.player.ReadyWeapon;
+        let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		return hdb_worntoggle>0 && target.CountInv("HD9mMag30")>=ShellCounter /*&& target == players[consoleplayer].camera*/ && ((hdb_wornammo==1&&target.CountInv("HD9mMag15")<ShellCounter||(hdb_wornammo==1&&target.FindInventory("HDPistol") != target.player.ReadyWeapon))
+		||(hdb_wornammo>-1&&(wep||Lastwep||MagInManager||(HoldUseKey>=hudthreshold1&&!(Shellcounter==1&&Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType)))));
+    }
+    default
+    {
+		HideousBubble.lower 17.;
+		HideousBubble.reach 2.;
+		HideousBubble.shift 3;
+		Bubble_WornShells.ShellType "HD9mMag30";
+		Bubble_WornShells.shellcounter 1;
+    }
+    states
+    {
+    Spawn:
+        CLP3 A 1{angle=target.angle;pitch=-90;
+		let thisMag = HDMagAmmo(target.findInventory("HD9mMag30"));
+		let mag = HDMagAmmo(target.findInventory("HD9mMag30"));
+		int curmag = mag.mags[mag.mags.size()-ShellCounter];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(MagSprite=="CLP3A0"){Roll=0;
+			if(curmag>29||(hdb_wornmags<1&&curmag>0))frame=0;
+			else{
+			if(curmag<2)frame=3;
+			else if(curmag<26)frame=curmag/1.5+3;
+			else if(curmag<28)frame=20;
+			else frame=21;}}
+		else {Frame=1;Roll=90;}
+		if(target.height>34){pitch=-90;lower=default.lower;}
+			else if(target.height>20){pitch=-60;lower=default.lower+13;}
+			else {pitch=0;lower=34;}}
+        Wait;
+    }
+}
+class Bubble_Worn9Mag30_2 : Bubble_Worn9Mag30
+{
+    default
+    {
+		HideousBubble.shift -3;
+		Bubble_WornShells.ShellCounter 2;
+    }
+}
+class Bubble_Worn9Mag30_3 : Bubble_Worn9Mag30
+{
+    default
+    {
+		HideousBubble.lower 22.;
+		HideousBubble.reach 2;
+		HideousBubble.shift 3;
+		Bubble_WornShells.ShellCounter 3;
+    }
+}
+class Bubble_Worn9Mag30_4 : Bubble_Worn9Mag30
+{
+    default
+    {
+		HideousBubble.lower 22.;
+		HideousBubble.reach 2;
+		HideousBubble.shift -3;
+		Bubble_WornShells.ShellCounter 4;
+    }
+}
+class Bubble_Worn9Mag30_5 : Bubble_Worn9Mag30
+{
+    default
+    {
+		HideousBubble.shift 1;
+		Bubble_WornShells.ShellCounter 5;
+    }
+}
+class Bubble_Worn9Mag30_6 : Bubble_Worn9Mag30
+{
+    default
+    {
+		HideousBubble.shift -1;
+		Bubble_WornShells.ShellCounter 6;
+    }
+}
+class Bubble_Worn9Mag30_7 : Bubble_Worn9Mag30_3
+{
+    default
+    {
+		HideousBubble.shift 1;
+		Bubble_WornShells.ShellCounter 7;
+    }
+}
+class Bubble_Worn9Mag30_8 : Bubble_Worn9Mag30_3
+{
+    default
+    {
+		HideousBubble.shift -1;
+		Bubble_WornShells.ShellCounter 8;
+    }
+}
+
+class Bubble_Worn7mClip : Bubble_Worn4Mag
+{
+	
+	override bool CheckVisible(Actor target)
+    {
+		WornExist="BossRifle";
+		WornExist1="BossRifle";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		class<actor> MagType = ShellType;
+		let MagInManager = (Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType&&Shellcounter!=1);
+		let wep = target.FindInventory("BossRifle") == target.player.ReadyWeapon;
+        let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		if(addwep1)
+		{
+		return hdb_worntoggle>0 && target.CountInv("HD7mClip")>=ShellCounter /*&& target == players[consoleplayer].camera*/ && ((hdb_wornammo==1&&target.CountInv("HD7mClip")<ShellCounter||(hdb_wornammo==1&&target.FindInventory(addwep1) != target.player.ReadyWeapon))
+		||(hdb_wornammo>-1&&(wep||MagInManager||Lastwep||(HoldUseKey>=hudthreshold1&&!(Shellcounter==1&&Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType)))));
+		}
+		return hdb_worntoggle>0 && target.CountInv("HD7mClip")>=ShellCounter /*&& target == players[consoleplayer].camera*/ && ((hdb_wornammo==1&&target.CountInv("HD7mClip")<ShellCounter||hdb_wornammo==1)||(hdb_wornammo>-1&&
+		(wep||MagInManager||Lastwep||(HoldUseKey>=hudthreshold1&&!(Shellcounter==1&&Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType)))));
+	}
+    default
+    {
+		HideousBubble.lower 28.;
+		HideousBubble.reach 3;
+		HideousBubble.shift -3;
+		Bubble_WornShells.ShellType "HD7mClip";
+		Bubble_WornShells.addonweapon1 "CarcanoRifle";
+		Bubble_WornShells.shellcounter 1;
+		scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        RCLP A 1{angle=target.angle+20;pitch=-90;
+		let thisMag = HDMagAmmo(target.findInventory("HD7mClip"));
+		let mag = HDMagAmmo(target.findInventory("HD7mClip"));
+		int curmag = mag.mags[mag.mags.size()-ShellCounter];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(Frame!=5)Roll=0;
+		else Roll=90;
+		if(target.height>34){pitch=-90;lower=28;}
+			else if(target.height>20){pitch=-120;lower=30;}
+			else {pitch=0;lower=34;}}
+        Wait;
+    }
+}
+class Bubble_Worn7mClip_2 : Bubble_Worn7mClip
+{
+    default
+    {
+		HideousBubble.reach 2;
+		HideousBubble.shift -4;
+		Bubble_WornShells.shellcounter 2;
+    }
+}
+class Bubble_Worn7mClip_3 : Bubble_Worn7mClip
+{
+    default
+    {
+		HideousBubble.reach 1;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 3;
+    }
+}
+class Bubble_Worn7mClip_4 : Bubble_Worn7mClip
+{
+    default
+    {
+		HideousBubble.reach 0;
+		HideousBubble.shift -6;
+		Bubble_WornShells.shellcounter 4;
+    }
+}
+class Bubble_Worn7mClip_5 : Bubble_Worn7mClip
+{
+	
+    default
+    {
+		HideousBubble.lower 23.;
+		HideousBubble.reach 4.5;
+		HideousBubble.shift -3;
+		Bubble_WornShells.shellcounter 5;
+		scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        RCLP A 1{angle=target.angle+20;pitch=-100;
+		let thisMag = HDMagAmmo(target.findInventory("HD7mClip"));
+		let mag = HDMagAmmo(target.findInventory("HD7mClip"));
+		int curmag = mag.mags[mag.mags.size()-ShellCounter];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(Frame!=5)Roll=0;
+		else Roll=90;
+		if(target.height>34){pitch=-100;lower=23;}
+			else if(target.height>20){pitch=-130;lower=25;}
+			else {pitch=0;lower=35;}}
+        Wait;
+    }
+}
+class Bubble_Worn7mClip_6 : Bubble_Worn7mClip_5
+{
+    default
+    {
+		HideousBubble.reach 3.5;
+		HideousBubble.shift -4;
+		Bubble_WornShells.shellcounter 6;
+    }
+}
+class Bubble_Worn7mClip_7 : Bubble_Worn7mClip_5
+{
+    default
+    {
+		HideousBubble.reach 2.5;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 7;
+    }
+}
+class Bubble_Worn7mClip_8 : Bubble_Worn7mClip_5
+{
+    default
+    {
+		HideousBubble.reach 1.5;
+		HideousBubble.shift -6;
+		Bubble_WornShells.shellcounter 8;
+    }
+}
+class Bubble_WornCarcanoClip : Bubble_Worn7mClip
+{
+	String clssname;
+	class<Inventory> cls;
+	Override Void PostBeginPlay()
+	{
+		clssname = "HDCarcanoClip";
+		cls = clssname;
+		Super.PostBeginPlay();
+	}
+	override bool CheckVisible(Actor target)
+    {
+		WornExist="CarcanoRifle";
+		WornExist1="CarcanoRifle";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		if(WornExist&&cls){
+		class<actor> MagType = ShellType;
+		let MagInManager = (Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType&&Shellcounter!=1);
+		let wep = target.FindInventory(WornExist) == target.player.ReadyWeapon;
+        let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		return hdb_worntoggle>0 && target.CountInv(cls)>=ShellCounter /*&& target == players[consoleplayer].camera*/ && ((hdb_wornammo==1&&target.CountInv(cls)<ShellCounter||(hdb_wornammo==1&&target.findinventory("BossRifle")!=Target.player.readyWeapon))||
+		(hdb_wornammo>-1&&(wep||Lastwep||MagInManager||(HoldUseKey>=hudthreshold1&&!(Shellcounter==1&&Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType)))));
+		}
+		return false;
+	}
+    default
+    {
+		HideousBubble.lower 28.;
+		HideousBubble.reach 3;
+		HideousBubble.shift -3;
+		Bubble_WornShells.ShellType "HDCarcanoClip";
+		Bubble_WornShells.addonweapon1 "CarcanoRifle";
+		Bubble_WornShells.shellcounter 1;
+		scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        CCLP A 1{angle=target.angle+20;pitch=-90;
+		if(cls){
+		let thisMag = HDMagAmmo(target.findInventory(cls));
+		let mag = HDMagAmmo(target.findInventory(cls));
+		int curmag = mag.mags[mag.mags.size()-ShellCounter];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(Frame!=6)Roll=0;
+		else Roll=90;
+		if(target.height>34){pitch=-90;lower=28;}
+			else if(target.height>20){pitch=-120;lower=30;}
+			else {pitch=0;lower=34;}}}
+        Wait;
+    }
+}
+class Bubble_WornCarcanoClip_2 : Bubble_WornCarcanoClip
+{
+    default
+    {
+		HideousBubble.reach 2;
+		HideousBubble.shift -4;
+		Bubble_WornShells.shellcounter 2;
+    }
+}
+class Bubble_WornCarcanoClip_3 : Bubble_WornCarcanoClip
+{
+    default
+    {
+		HideousBubble.reach 1;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 3;
+    }
+}
+class Bubble_WornCarcanoClip_4 : Bubble_WornCarcanoClip
+{
+    default
+    {
+		HideousBubble.reach 0;
+		HideousBubble.shift -6;
+		Bubble_WornShells.shellcounter 4;
+    }
+}
+class Bubble_WornCarcanoClip_5 : Bubble_WornCarcanoClip
+{
+	
+    default
+    {
+		HideousBubble.lower 23.;
+		HideousBubble.reach 4.5;
+		HideousBubble.shift -3;
+		Bubble_WornShells.shellcounter 5;
+		scale 0.5;
+    }
+    states
+    {
+    Spawn:
+        CCLP A 1{angle=target.angle+20;pitch=-100;
+		if(cls){
+		let thisMag = HDMagAmmo(target.findInventory(cls));
+		let mag = HDMagAmmo(target.findInventory(cls));
+		int curmag = mag.mags[mag.mags.size()-ShellCounter];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(Frame!=6)Roll=0;
+		else Roll=90;
+		if(target.height>34){pitch=-100;lower=23;}
+			else if(target.height>20){pitch=-130;lower=25;}
+			else {pitch=0;lower=35;}}}
+        Wait;
+    }
+}
+class Bubble_WornCarcanoClip_6 : Bubble_WornCarcanoClip_5
+{
+    default
+    {
+		HideousBubble.reach 3.5;
+		HideousBubble.shift -4;
+		Bubble_WornShells.shellcounter 6;
+    }
+}
+class Bubble_WornCarcanoClip_7 : Bubble_WornCarcanoClip_5
+{
+    default
+    {
+		HideousBubble.reach 2.5;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 7;
+    }
+}
+class Bubble_WornCarcanoClip_8 : Bubble_WornCarcanoClip_5
+{
+    default
+    {
+		HideousBubble.reach 1.5;
+		HideousBubble.shift -6;
+		Bubble_WornShells.shellcounter 8;
+    }
+}
+
+class Bubble_WornBattery : Bubble_Worn4Mag
+{
+	
+	override bool CheckVisible(Actor target)
+    {
+		WornExist="ThunderBuster";
+		WornExist1="BFG9k";
+		WornExist2="Vulcanette";
+		WornExist3="HDJetPack";
+		WornExist4="HERPUsable";
+		WornExist5="Lumberjack";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		class<actor> MagType = ShellType;
+		let MagInManager = (Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType&&Shellcounter!=1);
+		let wep = (target.FindInventory(WornExist) == target.player.ReadyWeapon||target.FindInventory(WornExist1) == target.player.ReadyWeapon||target.FindInventory(WornExist2) == target.player.ReadyWeapon||target.FindInventory(WornExist3) == target.player.ReadyWeapon||
+		target.FindInventory(WornExist4) == target.player.ReadyWeapon||target.FindInventory(WornExist5) == target.player.ReadyWeapon);
+        let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist2))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist3))==HDPlayerPawn(target).lastweapon||
+		HDWeapon(target.findInventory(WornExist4))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist5))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		
+		return hdb_worntoggle>0 && target.CountInv(ShellType)>=ShellCounter /*&& target == players[consoleplayer].camera*/ && ((hdb_wornammo==1&&target.CountInv(ShellType)<ShellCounter||hdb_wornammo==1)||(hdb_wornammo>-1&&
+		(wep||Lastwep||MagInManager||(HoldUseKey>=hudthreshold1&&!(Shellcounter==1&&Target.findinventory("MagManager")==target.player.readyweapon&&MagManager(target.player.readyweapon).thismagtype==MagType)))));
+	}
+    default
+    {
+		HideousBubble.lower 25.;
+		HideousBubble.reach 2;
+		HideousBubble.shift -4;
+		Bubble_WornShells.ShellType "HDBattery";
+		Bubble_WornShells.shellcounter 1;
+		scale 0.3;
+    }
+    states
+    {
+    Spawn:
+        CELL A 1{angle=target.angle+10;pitch=-90;
+		let thisMag = HDMagAmmo(target.findInventory("HDBattery"));
+		let mag = HDMagAmmo(target.findInventory("HDBattery"));
+		int blyat=1;
+		if(target.findinventory(ShellType)&&target.countinv(ShellType)>=ShellCounter&&mag.mags.size()>=Shellcounter)blyat=Shellcounter;
+		int curmag = mag.mags[mag.mags.size()-blyat];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(target.height>34){lower=25;}
+			else if(target.height>20){lower=27;}
+			else {lower=34;}}
+        Wait;
+    }
+}
+class Bubble_WornBattery_2 : Bubble_WornBattery
+{
+    default
+    {
+		HideousBubble.lower 25.;
+		HideousBubble.shift 4;
+		Bubble_WornShells.shellcounter 2;
+    }
+    states
+    {
+    Spawn:
+        CELL A 1{angle=target.angle-10;pitch=-90;
+		let thisMag = HDMagAmmo(target.findInventory("HDBattery"));
+		let mag = HDMagAmmo(target.findInventory("HDBattery"));
+		int blyat=1;
+		if(target.findinventory(ShellType)&&target.countinv(ShellType)>=ShellCounter&&mag.mags.size()>=Shellcounter)blyat=Shellcounter;
+		int curmag = mag.mags[mag.mags.size()-blyat];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(target.height>34){lower=25;}
+			else if(target.height>20){lower=27;}
+			else {lower=34;}}
+        Wait;
+    }
+}
+class Bubble_WornBattery_3 : Bubble_WornBattery
+{
+    default
+    {
+		HideousBubble.reach -1;
+		HideousBubble.shift -7;
+		Bubble_WornShells.shellcounter 3;
+    }
+    states
+    {
+    Spawn:
+        CELL A 1{angle=target.angle+60;pitch=-90;
+		let thisMag = HDMagAmmo(target.findInventory(ShellType));
+		let mag = HDMagAmmo(target.findInventory(ShellType));
+		int blyat=1;
+		if(target.findinventory(ShellType)&&target.countinv(ShellType)>=ShellCounter&&mag.mags.size()>=Shellcounter)blyat=Shellcounter;
+		int curmag = mag.mags[mag.mags.size()-blyat];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(target.height>34){lower=25;}
+			else if(target.height>20){lower=27;}
+			else {lower=34;}}
+        Wait;
+    }
+}
+class Bubble_WornBattery_4 : Bubble_WornBattery
+{
+    default
+    {
+		HideousBubble.reach -1;
+		HideousBubble.shift 7;
+		Bubble_WornShells.shellcounter 4;
+    }
+    states
+    {
+    Spawn:
+        CELL A 1{angle=target.angle-60;pitch=-90;
+		let thisMag = HDMagAmmo(target.findInventory(ShellType));
+		let mag = HDMagAmmo(target.findInventory(ShellType));
+		int blyat=1;
+		if(target.findinventory(ShellType)&&target.countinv(ShellType)>=ShellCounter&&mag.mags.size()>=Shellcounter)blyat=Shellcounter;
+		int curmag = mag.mags[mag.mags.size()-blyat];
+		string magsprite; string roundsprite; name roundtype; double scl;
+            [magsprite, roundsprite, roundtype, scl] = mag.getmagsprite(curmag);
+		CopySprite(MagSprite);
+		if(target.height>34){lower=25;}
+			else if(target.height>20){lower=27;}
+			else {lower=34;}}
+        Wait;
+    }
+}
+class Bubble_WornBattery_5 : Bubble_WornBattery_2
+{
+    default
+    {
+		HideousBubble.Reach -7;
+		HideousBubble.Shift -4;
+		Bubble_WornShells.shellcounter 5;
+    }
+}
+class Bubble_WornBattery_6 : Bubble_WornBattery
+{
+    default
+    {
+		HideousBubble.Reach -7;
+		HideousBubble.Shift 4;
+		Bubble_WornShells.shellcounter 6;
+    }
+}
+class Bubble_WornBattery_7 : Bubble_WornBattery_4
+{
+    default
+    {
+		HideousBubble.Reach -5;
+		HideousBubble.Shift -7;
+		Bubble_WornShells.shellcounter 7;
+    }
+}
+class Bubble_WornBattery_8 : Bubble_WornBattery_3
+{
+    default
+    {
+		HideousBubble.Reach -5;
+		HideousBubble.Shift 7;
+		Bubble_WornShells.shellcounter 8;
+    }
+}
+
+class Bubble_WornRgrenade : Bubble_WornShells
+{
+	override bool CheckVisible(Actor target)
+    {
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		class<weapon> WornExist;
+		class<weapon> WornExist1;
+		class<weapon> WornExist2;
+		class<weapon> WornExist3;
+		WornExist="LiberatorRifle";
+		WornExist1="Blooper";
+		WornExist2="HDRL";
+		WornExist3="ZM66AssaultRifle";
+		Let Wep2 = Target.Findinventory(Wornexist1)==Target.Player.readyWeapon||Target.Findinventory(Wornexist2)==Target.Player.readyWeapon;
+		Let Lwep2 = (HDWeapon(target.findInventory(WornExist2))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findinventory("NullWeapon")==Target.player.readyWeapon;
+		if(hdb_wornammo==1){
+		if(!target.findinventory(WornExist)&&!target.findinventory(WornExist3))
+		return hdb_worntoggle>0 && ((target.findInventory("HDRocketAmmo")||Lwep2||Wep2)||(HoldUseKey>=hudthreshold1&&target.findInventory("HDRocketAmmo")));
+		
+		else if (target.findinventory(WornExist)&&target.findinventory(WornExist3)){
+		Let ZM = Target.Findinventory(Wornexist3)==Target.Player.readyWeapon;
+		Let LZM = HDWeapon(target.findInventory(WornExist3))==HDPlayerPawn(target).lastweapon&&target.findinventory("NullWeapon")==Target.player.readyWeapon;
+		Let ZMFrame = 
+		HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGSD0"||HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGSA0"||
+		HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGLD0"||HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGLA0";
+		Let Lib = Target.Findinventory(Wornexist)==Target.Player.readyWeapon;
+		Let LLib = HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon&&target.findinventory("NullWeapon")==Target.player.readyWeapon;
+		Let LibFrame = 
+		HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLH0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLF0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLD0"||
+		HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLB0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLH0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLF0"
+		||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLD0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLB0";
+		return hdb_worntoggle>0 && ((target.findInventory("HDRocketAmmo")||Lwep2||Wep2||((Lib||LLib)&&LibFrame)||((ZM||LZM)&&ZMFrame))||(HoldUseKey>=hudthreshold1&&target.findInventory("HDRocketAmmo")));}
+		
+		else if (target.findinventory(WornExist)){
+		Let Lib = Target.Findinventory(Wornexist)==Target.Player.readyWeapon;
+		Let LLib = HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon&&target.findinventory("NullWeapon")==Target.player.readyWeapon;
+		Let LibFrame = 
+		HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLH0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLF0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLD0"||
+		HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLB0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLH0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLF0"
+		||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLD0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLB0";
+		return hdb_worntoggle>0 && ((target.findInventory("HDRocketAmmo")||Lwep2||Wep2||((Lib||LLib)&&LibFrame))||(HoldUseKey>=hudthreshold1&&target.findInventory("HDRocketAmmo")));}
+		
+		Else if (target.findinventory(WornExist3)){
+		Let ZM = Target.Findinventory(Wornexist3)==Target.Player.readyWeapon;
+		Let LZM = HDWeapon(target.findInventory(WornExist3))==HDPlayerPawn(target).lastweapon&&target.findinventory("NullWeapon")==Target.player.readyWeapon;
+		Let ZMFrame = 
+		HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGSD0"||HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGSA0"||
+		HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGLD0"||HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGLA0";
+		return hdb_worntoggle>0 && ((target.findInventory("HDRocketAmmo")||Lwep2||Wep2||((ZM||LZM)&&ZMFrame))||(HoldUseKey>=hudthreshold1&&target.findInventory("HDRocketAmmo")));}
+		}
+		
+		else if(hdb_wornammo==0){
+		if(!target.findinventory(WornExist)&&!target.findinventory(WornExist3))
+		return hdb_worntoggle>0 && (Lwep2||Wep2||(HoldUseKey>=hudthreshold1&&target.findInventory("HDRocketAmmo")));
+		
+		else if (target.findinventory(WornExist)&&target.findinventory(WornExist3)){
+		Let ZM = Target.Findinventory(Wornexist3)==Target.Player.readyWeapon;
+		Let LZM = HDWeapon(target.findInventory(WornExist3))==HDPlayerPawn(target).lastweapon&&target.findinventory("NullWeapon")==Target.player.readyWeapon;
+		Let ZMFrame = 
+		HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGSD0"||HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGSA0"||
+		HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGLD0"||HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGLA0";
+		Let Lib = Target.Findinventory(Wornexist)==Target.Player.readyWeapon;
+		Let LLib = HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon&&target.findinventory("NullWeapon")==Target.player.readyWeapon;
+		Let LibFrame = 
+		HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLH0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLF0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLD0"||
+		HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLB0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLH0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLF0"
+		||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLD0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLB0";
+		return hdb_worntoggle>0 && (Lwep2||Wep2||(((Lib||LLib)&&LibFrame)||((ZM||LZM)&&ZMFrame)&&target.findInventory("HDRocketAmmo"))||(HoldUseKey>=hudthreshold1&&target.findInventory("HDRocketAmmo")));}
+		
+		else if (target.findinventory(WornExist)){
+		Let Lib = Target.Findinventory(Wornexist)==Target.Player.readyWeapon;
+		Let LLib = HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon&&target.findinventory("NullWeapon")==Target.player.readyWeapon;
+		Let LibFrame = 
+		HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLH0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLF0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLD0"||
+		HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRFLB0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLH0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLF0"
+		||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLD0"||HDWeapon(target.findInventory(WornExist)).getPickupSprite()=="BRLLB0";
+		return hdb_worntoggle>0 && (Lwep2||Wep2||(((Lib||LLib)&&LibFrame)&&target.findInventory("HDRocketAmmo"))||(HoldUseKey>=hudthreshold1&&target.findInventory("HDRocketAmmo")));}
+		
+		Else if (target.findinventory(WornExist3)){
+		Let ZM = Target.Findinventory(Wornexist3)==Target.Player.readyWeapon;
+		Let LZM = HDWeapon(target.findInventory(WornExist3))==HDPlayerPawn(target).lastweapon&&target.findinventory("NullWeapon")==Target.player.readyWeapon;
+		Let ZMFrame = 
+		HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGSD0"||HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGSA0"||
+		HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGLD0"||HDWeapon(target.findInventory(WornExist3)).getPickupSprite()=="RIGLA0";
+		return hdb_worntoggle>0 && (Lwep2||Wep2||(((ZM||LZM)&&ZMFrame)&&target.findInventory("HDRocketAmmo"))||(HoldUseKey>=hudthreshold1&&target.findInventory("HDRocketAmmo")));}
+		}
+		
+		Return False;
+	}
+	override void PostBeginPlay()
+    {
+        pitch = -90.;
+    }
+    default
+    {
+		+INTERPOLATEANGLES
+        +FLATSPRITE;
+        +ROLLSPRITE
+        -FORCEXYBILLBOARD
+        HideousBubble.lower 12.;
+        HideousBubble.reach 1.;
+		HideousBubble.shift -9;
+		Bubble_WornShells.ShellType "HDRocketAmmo";
+		Bubble_WornShells.shellcounter 1;
+		Scale 0.35;
+    }
+    states
+    {
+    Spawn:
+        ROQP A 1{
+		if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;
+		else if(target.countinv("HDRocketAmmo")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=-90;
+		Pitch=-110;
+		if(target.height>34)lower=12;
+		else if(target.height>20)lower=18;
+		}
+        Wait;
+    }
+}
+
+class Bubble_WornRgrenade2 : Bubble_WornRgrenade
+{
+    default
+    {
+        HideousBubble.lower 17.;
+        HideousBubble.reach 2.7;
+		HideousBubble.shift -8;
+		Bubble_WornShells.shellcounter 2;}
+		states
+    {
+    Spawn:
+        ROQP B 1{
+		if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;
+		else if(target.countinv("HDRocketAmmo")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=-75;Pitch=-100;
+		if(target.height>34)lower=17;
+		else if(target.height>20)lower=23;}
+        Wait;
+    }}
+class Bubble_WornRgrenade3 : Bubble_WornRgrenade
+{
+    default
+    {
+        HideousBubble.lower 22.;
+        HideousBubble.reach 3.;
+		HideousBubble.shift -5;
+		Bubble_WornShells.shellcounter 3;
+		}states
+    {
+    Spawn:
+        ROQP B 1{if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;else Frame=3;Angle=target.angle;Roll=-50;if(target.height>34)lower=22;
+		else if(target.height>20)lower=28;}
+        Wait;
+    }}		
+class Bubble_WornRgrenade4 : Bubble_WornRgrenade
+{
+    default
+    {
+        HideousBubble.lower 25.;
+        HideousBubble.reach 3.;
+		HideousBubble.shift -1;
+		Bubble_WornShells.shellcounter 4;}
+		states
+    {
+    Spawn:
+        ROQP B 1{if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;else Frame=3;Angle=target.angle;Roll=-30;if(target.height>34)lower=25;
+		else if(target.height>20)lower=31;}
+        Wait;
+    }}
+class Bubble_WornRgrenade5 : Bubble_WornRgrenade
+{
+    default
+    {
+        HideousBubble.lower 27.;
+        HideousBubble.reach 2.5;
+		HideousBubble.shift 4;
+		Bubble_WornShells.shellcounter 5;}
+		states
+    {
+    Spawn:
+        ROQP B 1{if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;else Frame=3;Angle=target.angle-15;Roll=-20;if(target.height>34)lower=27;
+		else if(target.height>20)lower=33;}
+        Wait;
+    }}
+class Bubble_WornRgrenade6 : Bubble_WornRgrenade
+{
+    default
+    {
+        HideousBubble.lower 28.;
+        HideousBubble.reach 0.;
+		HideousBubble.shift 8;
+		Bubble_WornShells.shellcounter 6;
+		}states
+    {
+    Spawn:
+        ROQP B 1{if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;else Frame=3;Angle=target.angle-45;Roll=-10;if(target.height>34)lower=28;
+		else if(target.height>20)lower=34;}
+        Wait;
+    }}		
+class Bubble_WornRgrenade7 : Bubble_WornRgrenade6
+{
+    default
+    {
+        HideousBubble.reach -4.;
+		Bubble_WornShells.shellcounter 7;}
+		states
+    {
+    Spawn:
+        ROQP B 1{if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;else Frame=3;Angle=target.angle+45;Roll=-10;if(target.height>34)lower=28;
+		else if(target.height>20)lower=34;}
+        Wait;
+    }}		
+class Bubble_WornRgrenade8 : Bubble_WornRgrenade5
+{
+    default
+    {
+        HideousBubble.reach -5.5;
+		Bubble_WornShells.shellcounter 8;
+    }
+	states
+    {
+    Spawn:
+        ROQP B 1{if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;else Frame=3;Angle=target.angle+15;Roll=-20;if(target.height>34)lower=27;
+		else if(target.height>20)lower=33;}
+        Wait;
+    }}
+class Bubble_WornRgrenade9 : Bubble_WornRgrenade4
+{
+    default
+    {
+        HideousBubble.reach -6.;
+		Bubble_WornShells.shellcounter 9;
+    }}
+class Bubble_WornRgrenade10 : Bubble_WornRgrenade3
+{
+    default
+    {
+        HideousBubble.reach -6.;
+		Bubble_WornShells.shellcounter 10;
+    }}	
+class Bubble_WornRgrenade11 : Bubble_WornRgrenade2
+{
+    default
+    {
+        HideousBubble.reach -6.;
+		Bubble_WornShells.shellcounter 11;
+    }}	
+class Bubble_WornRgrenade12 : Bubble_WornRgrenade
+{
+    default
+    {
+        HideousBubble.reach -5.;
+		Bubble_WornShells.shellcounter 12;
+    }
+	states
+    {
+    Spawn:
+        ROQP A 1{
+		if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;
+		else if(target.countinv("HDRocketAmmo")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=-90;
+		Pitch=-70;
+		if(target.height>34)lower=12;
+		else if(target.height>20)lower=18;
+		}
+        Wait;
+    }}	
+class Bubble_WornRgrenade13 : Bubble_WornRgrenade
+{
+    default
+    {HideousBubble.lower 10.;
+        HideousBubble.reach -1.;
+		Bubble_WornShells.shellcounter 13;
+    }
+	states
+    {
+    Spawn:
+        ROQP A 1{
+		if(target.countinv("HDRocketAmmo")<shellcounter) frame=2;
+		else if(target.countinv("HDRocketAmmo")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=-90;
+		Pitch=0;
+		if(target.height>34)lower=10;
+		else if(target.height>20)lower=16;
+		}
+        Wait;
+    }}		
+class Bubble_WornHEAT : Bubble_WornShells
+{
+	override bool CheckVisible(Actor target)
+    {
+		WornExist="HDRL";
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		let wep = target.FindInventory(WornExist) == target.player.ReadyWeapon;
+        let Lastwep = HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		
+		return hdb_worntoggle>0 && target.CountInv(ShellType)>=ShellCounter && target == players[consoleplayer].camera && ((hdb_wornammo==1&&target.CountInv(ShellType)<ShellCounter||hdb_wornammo==1)||(hdb_wornammo>-1&&(wep||Lastwep||HoldUseKey>=hudthreshold1)));
+	}
+    default
+    {
+		+YFLIP
+		HideousBubble.reach 4;
+		HideousBubble.shift -5;
+		Bubble_WornShells.ShellType "HEATammo";
+		Bubble_WornShells.shellcounter 1;
+		scale 0.37;
+    }
+    states
+    {
+    Spawn:
+        ROCK A 1{angle=target.angle+10;pitch=-90;
+		if(target.height>34){lower=19;}
+		else if(target.height>20){lower=25;}
+		else {lower=34;}}
+        Wait;
+    }
+}	
+class Bubble_WornHEAT_2 : Bubble_WornHEAT
+{
+    default
+    {
+		HideousBubble.reach 4.5;
+		HideousBubble.shift -1;
+		Bubble_WornShells.shellcounter 2;
+    }
+    states
+    {
+    Spawn:
+        ROCK A 1{angle=target.angle;pitch=-90;
+		if(target.height>34){lower=25;}
+		else if(target.height>20){lower=31;}
+		else {lower=34;}}
+        Wait;
+    }
+}		
+class Bubble_WornHEAT_3 : Bubble_WornHEAT
+{
+    default
+    {
+		HideousBubble.reach 3.5;
+		HideousBubble.shift 4;
+		Bubble_WornShells.shellcounter 3;
+    }
+    states
+    {
+    Spawn:
+        ROCK A 1{angle=target.angle-10;pitch=-90;
+		if(target.height>34){lower=31;}
+		else if(target.height>20){lower=37;}
+		else {lower=34;}}
+        Wait;
+    }
+}	
+class Bubble_WornHEAT_4 : Bubble_WornHEAT
+{
+    default
+    {
+		HideousBubble.reach 1;
+		HideousBubble.shift 9;
+		Bubble_WornShells.shellcounter 4;
+    }
+    states
+    {
+    Spawn:
+        ROCK A 1{angle=target.angle-30;pitch=-90;
+		if(target.height>34){lower=33;}
+		else if(target.height>20){lower=39;}
+		else {lower=34;}}
+        Wait;
+    }
+}	
+class Bubble_WornHEAT_5 : Bubble_WornHEAT_4
+{
+    default
+    {
+		HideousBubble.reach -2;
+		Bubble_WornShells.shellcounter 5;
+    }
+    states
+    {
+    Spawn:
+        ROCK A 1{angle=target.angle+30;pitch=-90;
+		if(target.height>34){lower=33;}
+		else if(target.height>20){lower=39;}
+		else {lower=34;}}
+        Wait;
+    }
+}	
+class Bubble_WornHEAT_6 : Bubble_WornHEAT_3
+{
+    default
+    {
+		HideousBubble.reach -5;
+		Bubble_WornShells.shellcounter 6;
+    }
+    states
+    {
+    Spawn:
+        ROCK A 1{angle=target.angle+10;pitch=-90;
+		if(target.height>34){lower=31;}
+		else if(target.height>20){lower=37;}
+		else {lower=34;}}
+        Wait;
+    }
+}	
+class Bubble_WornHEAT_7 : Bubble_WornHEAT_2
+{
+    default
+    {
+		HideousBubble.reach -7;
+		Bubble_WornShells.shellcounter 7;
+    }
+}	
+class Bubble_WornHEAT_8 : Bubble_WornHEAT
+{
+    default
+    {
+		HideousBubble.reach -6;
+		Bubble_WornShells.shellcounter 8;
+    }
+    states
+    {
+    Spawn:
+        ROCK A 1{angle=target.angle-10;pitch=-90;
+		if(target.height>34){lower=19;}
+		else if(target.height>20){lower=25;}
+		else {lower=34;}}
+        Wait;
+    }
+}	
+
+class Bubble_WornBolt : Bubble_WornRgrenade
+{
+	override bool CheckVisible(Actor target)
+    {
+	WornExist="Brontornis";
+	WornExist1="";
+	int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+    let Wep = target.FindInventory("Brontornis") == target.player.ReadyWeapon;
+	let Lastwep = (HDWeapon(target.findInventory(WornExist))==HDPlayerPawn(target).lastweapon||HDWeapon(target.findInventory(WornExist1))==HDPlayerPawn(target).lastweapon)&&target.findInventory("NullWeapon")==Target.Player.ReadyWeapon;
+		
+	return hdb_worntoggle>0 && ((hdb_wornammo==1&&(wep||Lastwep||target.findInventory("BrontornisRound")))||(hdb_wornammo==0&&(wep||Lastwep||HoldUseKey>=hudthreshold1&&Target.FindInventory(ShellType))));
+    }
+	Override Void PostBeginPlay()
+	{
+	Pitch=-90;
+	Translation=Target.Translation;
+	}
+    default
+    {
+        Bubble_WornShells.ShellType "BrontornisRound";
+		Bubble_WornShells.ShellCounter 1;
+		HideousBubble.lower 12.;
+        HideousBubble.reach 1.2;
+		HideousBubble.shift 9;
+    }
+    states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=90;
+		Pitch=-120;
+		if(target.height>34)lower=12;
+		else if(target.height>20)lower=18;
+		}
+        Wait;
+    }
+}
+class Bubble_WornBolt2 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 14.;
+        HideousBubble.reach 2.5;
+		HideousBubble.shift 8;
+		Bubble_WornShells.ShellCounter 2;}
+		states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle-10;Roll=75;
+		Pitch=-110;
+		if(target.height>34)lower=14;
+		else if(target.height>20)lower=20;
+		}
+        Wait;
+    }}
+class Bubble_WornBolt3 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 17.;
+        HideousBubble.reach 3.;
+		HideousBubble.shift 8;
+		Bubble_WornShells.ShellCounter 3;}//2
+		states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle-10;Roll=75;
+		Pitch=-110;
+		if(target.height>34)lower=17;
+		else if(target.height>20)lower=21;
+		}
+        Wait;
+    }}
+class Bubble_WornBolt4 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 18.;
+        HideousBubble.reach 4;
+		HideousBubble.shift 7;
+		Bubble_WornShells.ShellCounter 4;}
+		states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=65;
+		Pitch=-90;
+		if(target.height>34)lower=18;
+		else if(target.height>20)lower=24;
+		}
+        Wait;
+    }}	
+class Bubble_WornBolt5 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 21.;
+        HideousBubble.reach 4.;
+		HideousBubble.shift 6;
+		Bubble_WornShells.ShellCounter 5;
+		}states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=50;if(target.height>34)lower=21;
+		else if(target.height>20)lower=27;}
+        Wait;
+    }}
+class Bubble_WornBolt6 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 23.;
+        HideousBubble.reach 4.;
+		HideousBubble.shift 4;
+		Bubble_WornShells.ShellCounter 6;
+		}states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=40;
+		if(target.height>34)lower=23;
+		else if(target.height>20)lower=29;}
+        Wait;
+    }}	
+class Bubble_WornBolt7 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 25.;
+        HideousBubble.reach 4.;
+		HideousBubble.shift 2;
+		Bubble_WornShells.ShellCounter 7;}//4
+		states
+    {
+    Spawn:
+        BROC A 1{if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=30;
+		if(target.height>34)lower=25;
+		else if(target.height>20)lower=31;}
+        Wait;
+    }}
+class Bubble_WornBolt8 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 27.;
+        HideousBubble.reach 3;
+		HideousBubble.shift -1;
+		Bubble_WornShells.ShellCounter 8;}
+		states
+    {
+    Spawn:
+        BROC A 1{if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle+25;Roll=25;if(target.height>34)lower=27;
+		else if(target.height>20)lower=33;}
+        Wait;
+    }}	
+class Bubble_WornBolt9 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 29.;
+        HideousBubble.reach 1;
+		HideousBubble.shift -4;
+		Bubble_WornShells.ShellCounter 9;}
+		states
+    {
+    Spawn:
+        BROC A 1{if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle+25;Roll=20;if(target.height>34)lower=29;
+		else if(target.height>20)lower=35;}
+        Wait;
+    }}
+class Bubble_WornBolt10 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 30.;
+        HideousBubble.reach 0;
+		HideousBubble.shift -6;
+		Bubble_WornShells.ShellCounter 10;}
+		states
+    {
+    Spawn:
+        BROC A 1{if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle+25;Roll=20;if(target.height>34)lower=30;
+		else if(target.height>20)lower=36;}
+        Wait;
+    }}	
+class Bubble_WornBolt11 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 30.;
+        HideousBubble.reach -2.;
+		HideousBubble.shift -9;
+		Bubble_WornShells.ShellCounter 11;}//6
+		states
+    {
+    Spawn:
+        BROC A 1{if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle+25;Roll=10;if(target.height>34)lower=30;
+		else if(target.height>20)lower=36;}
+        Wait;
+    }}
+class Bubble_WornBolt12 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.lower 30.;
+        HideousBubble.reach -4.;
+		HideousBubble.shift -9;
+		Bubble_WornShells.ShellCounter 13;}
+		states
+    {
+    Spawn:
+        BROC A 1{if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle-25;Roll=10;if(target.height>34)lower=30;
+		else if(target.height>20)lower=36;}
+        Wait;
+    }}
+class Bubble_WornBolt13 : Bubble_WornBolt10
+{
+    default
+    {
+        HideousBubble.reach -6;
+		Bubble_WornShells.ShellCounter 13;}
+		states
+    {
+    Spawn:
+        BROC A 1{if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle-25;Roll=20;if(target.height>34)lower=30;
+		else if(target.height>20)lower=36;}
+        Wait;
+    }}
+class Bubble_WornBolt14 : Bubble_WornBolt9
+{
+    default
+    {
+        HideousBubble.reach -7;
+		Bubble_WornShells.ShellCounter 14;}
+		states
+    {
+    Spawn:
+        BROC A 1{if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle-25;Roll=20;if(target.height>34)lower=29;
+		else if(target.height>20)lower=35;}
+        Wait;
+    }}
+class Bubble_WornBolt15 : Bubble_WornBolt8
+{
+    default
+    {
+        HideousBubble.reach -8;
+		Bubble_WornShells.ShellCounter 15;}
+		states
+    {
+    Spawn:
+        BROC A 1{if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle-25;Roll=25;
+		if(target.height>34)lower=27;
+		else if(target.height>20)lower=33;}
+        Wait;
+    }}
+class Bubble_WornBolt16 : Bubble_WornBolt7
+{
+    default
+    {
+        HideousBubble.reach -8.;
+		Bubble_WornShells.ShellCounter 16;}
+	}
+class Bubble_WornBolt17 : Bubble_WornBolt6
+{
+    default
+    {
+        HideousBubble.reach -8.;
+		Bubble_WornShells.ShellCounter 17;}
+	}
+class Bubble_WornBolt18 : Bubble_WornBolt5
+{
+    default
+    {
+        HideousBubble.reach -8.;
+		Bubble_WornShells.ShellCounter 18;}
+	}
+class Bubble_WornBolt19 : Bubble_WornBolt4
+{
+    default
+    {
+        HideousBubble.reach -8.;
+		Bubble_WornShells.ShellCounter 19;}
+	}
+class Bubble_WornBolt20 : Bubble_WornBolt3
+{
+    default
+    {
+        HideousBubble.reach -7.;
+		Bubble_WornShells.ShellCounter 20;}//2
+		states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle+10;Roll=75;
+		Pitch=-70;
+		if(target.height>34)lower=17;
+		else if(target.height>20)lower=23;
+		}
+        Wait;
+    }}
+class Bubble_WornBolt21 : Bubble_WornBolt2
+{
+    default
+    {
+        HideousBubble.reach -6;
+		Bubble_WornShells.ShellCounter 21;}
+		states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle+10;Roll=75;
+		Pitch=-70;
+		if(target.height>34)lower=14;
+		else if(target.height>20)lower=20;
+		}
+        Wait;
+    }}
+class Bubble_WornBolt22 : Bubble_WornBolt
+{
+    default
+    {
+        HideousBubble.reach -5;
+		Bubble_WornShells.ShellCounter 22;}
+		states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=90;
+		Pitch=-60;
+		if(target.height>34)lower=12;
+		else if(target.height>20)lower=18;
+		}
+        Wait;
+    }}
+class Bubble_WornBolt23 : Bubble_WornBolt
+{
+    default
+    {
+		HideousBubble.lower 10.;
+        HideousBubble.reach -3;
+		Bubble_WornShells.ShellCounter 23;}
+		states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=90;
+		Pitch=-45;
+		if(target.height>34)lower=10;
+		else if(target.height>20)lower=16;
+		}
+        Wait;
+    }}
+class Bubble_WornBolt24 : Bubble_WornBolt
+{
+    default
+    {
+		HideousBubble.lower 10.;
+        HideousBubble.reach 0;
+		Bubble_WornShells.ShellCounter 24;}
+		states
+    {
+    Spawn:
+        BROC A 1{
+		if(target.countinv("BrontornisRound")<shellcounter) frame=2;
+		else if(target.countinv("BrontornisRound")>=shellcounter) frame=3;
+		Angle=target.angle;Roll=90;
+		Pitch=45;
+		}
+        Wait;
+    }}	

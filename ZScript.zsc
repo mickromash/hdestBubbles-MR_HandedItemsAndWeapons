@@ -1,0 +1,4 @@
+version "4.3"
+#include "ZScript/WAmmo.zsc"
+#include "ZScript/WItems.zsc"
+#include "ZScript/WWeapons.zsc"

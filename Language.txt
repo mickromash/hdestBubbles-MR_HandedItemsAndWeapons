@@ -1,0 +1,72 @@
+[default en eng enu]
+
+BUBBLEEnabled = "Enabled";
+BUBBLEBPACK = "Show Worn Backpacks";
+BUBBLEHEADINDI = "Show Player Heading Indicators";
+BUBBLEPLAYERWEAP = "Show Player Weapon";
+BUBBLEWEAPVISIBLE = "Weapon Visible to Self";
+BUBBLEMMANAGER = "Mag Manager Scaling";
+BUBBLERECOMENDATION = "Recommend disabling this if Weapon Visible to Self is enabled";
+BUBBLEDONTSCALE = "Don't scale";
+BUBBLEACTORSCALE = "Use actor scale";
+
+MRBUBBLENEVER = "Never";
+MRBUBBLEONWEAP = "Show only ammo type of weapon in hands";
+MRBUBBLEALWAYS = "Always";
+BUBBLEWORNAMMO = "Show handling ammo";
+BUBBLEWORNMAGS = "Show ammo in mags";
+BUBBLEWORNWEAPONS = "Show handling weapons";
+BUBBLEWORNITEMS = "Show handling items";
+BUBBLEWORNKEYS = "Show keys while holding use key";
+MRBUBBLEWEPN = "Only while holding use key";
+MRBUBBLEWEPA = "Always";
+MRBUBBLEWEPS = "Always Translucent";
+MRBUBBLEITEMN = "Never";
+MRBUBBLEITEMA = "Always";
+BUBBLEWORNSYNC = "Do not show blue potion and magic shield";
+BUBBLEWORNTURNTHISOFF = "\cr turn this on when playing in multiplayer";
+BUBBLEWORNTOGGLE = "Toggle worn bubbles";
+BUBBLEWORNTOGGLEKEY = "Toggle worn bubbles key";
+
+BUBBLEWORNARMOR = "Show worn armor";
+
+MRBUBBLENOARMOR = "No";
+MRBUBBLEOTHERSARMOR = "Only on other players";
+MRBUBBLEARMORBOTH = "Yes";
+
+
+[ru rus]
+
+BUBBLEEnabled = "Включен";
+BUBBLEBPACK = "Показать рюкзак";
+BUBBLEHEADINDI = "Индикатор взгляда игрока";
+BUBBLEPLAYERWEAP = "Оружие игрока";
+BUBBLEWEAPVISIBLE = "Оружие от третьего лица видно самому себе";
+BUBBLEMMANAGER = "Изменение размера обойм в менеджере";
+BUBBLERECOMENDATION = "Рекомендуется отключить если включено \"Оружие от третьего лица видно самому себе\"";
+BUBBLEDONTSCALE = "Не изменять";
+BUBBLEACTORSCALE = "В соответствии с обоймой";
+
+BUBBLEWORNAMMO = "Показывать переносимую амуницию";
+BUBBLEWORNMAGS = "Показывать патроны в магазинах";
+MRBUBBLENEVER = "Нет";
+MRBUBBLEONWEAP = "Только амуницию для оружия в руках";
+MRBUBBLEALWAYS = "Да";
+BUBBLEWORNWEAPONS = "Показывать переносимое оружие";
+BUBBLEWORNITEMS = "Показывать переносимые предметы";
+BUBBLEWORNKEYS = "Показывать ключи при зажатой клавише использовать";
+MRBUBBLEWEPN = "Только при зажатой клавише использовать";
+MRBUBBLEWEPA = "Да";
+MRBUBBLEWEPS = "Полупрозрачное";
+MRBUBBLEITEMN = "Нет";
+MRBUBBLEITEMA = "Да";
+BUBBLEWORNSYNC = "Не показывать бутылёк и генератор щита";
+BUBBLEWORNTURNTHISOFF = "\cr включи это при игре по сети";
+BUBBLEWORNTOGGLE = "Показать переносимые объекты";
+BUBBLEWORNTOGGLEKEY = "Показать переносимые объекты";
+BUBBLEWORNARMOR = "Показывать надетую броню";
+
+MRBUBBLENOARMOR = "Нет";
+MRBUBBLEOTHERSARMOR = "Только на других игроках";
+MRBUBBLEARMORBOTH = "Да";
+
