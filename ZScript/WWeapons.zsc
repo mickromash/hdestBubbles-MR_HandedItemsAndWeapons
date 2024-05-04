@@ -66,6 +66,7 @@ class Bubble_WornHunter : HideousBubble
     }
 	default
     {
+		+NOTIMEFREEZE
 		+INTERPOLATEANGLES
         -FORCEXYBILLBOARD
 		+FLATSPRITE

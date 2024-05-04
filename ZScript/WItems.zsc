@@ -904,6 +904,7 @@ class Bubble_WornArmor : HideousBubble
     }
 	default
     {
+		+NOTIMEFREEZE
 		-FORCEXYBILLBOARD
         +ROLLSPRITE
         HideousBubble.lower 23.;
