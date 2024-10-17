@@ -1,0 +1,221 @@
+ZMAGA = "ZMAGA" { UseActorPitch UseActorRoll scale = 0.5 }
+ZMAGB = "ZMAGB" { UseActorPitch UseActorRoll scale = 0.5 }
+ZMAGC = "ZMAGC" { UseActorPitch UseActorRoll scale = 0.5 }
+BPAKB = "BPAKB" {}
+BPAKC = "BPAKC" {}
+MEDIB = "MEDIB" { angleoffset = 180 UseActorPitch UseActorRoll }
+MEDIC = "MEDIC" { angleoffset = 180 UseActorPitch UseActorRoll }
+HUNTG = "HUNTA" { UseActorPitch UseActorRoll }
+HUNTF = "HUNTB" { UseActorPitch UseActorRoll }
+HUNTE = "HUNTC" { UseActorPitch UseActorRoll }
+HUNTD = "HUNTD" { UseActorPitch UseActorRoll }
+HUNTC = "HUNTE" { UseActorPitch UseActorRoll }
+HUNTB = "HUNTF" { UseActorPitch UseActorRoll }
+HUNTA = "HUNTG" { UseActorPitch UseActorRoll }
+slaya = "slaya" { UseActorPitch UseActorRoll angleoffset = 180 }
+slayb = "slayb" { UseActorPitch UseActorRoll angleoffset = 180 }
+slayc = "slayc" { UseActorPitch UseActorRoll angleoffset = 180 }
+slayd = "slayd" { UseActorPitch UseActorRoll angleoffset = 180 }
+slaye = "slaye" { UseActorPitch UseActorRoll angleoffset = 180 }
+slayf = "slayf" { UseActorPitch UseActorRoll angleoffset = 180 }
+slayg = "slayg" { UseActorPitch UseActorRoll angleoffset = 180 }
+
+blsta = "blsta" { UseActorPitch UseActorRoll }
+SPLTA = "SPLTA" { UseActorPitch UseActorRoll }
+SPLTB = "SPLTB" { UseActorPitch UseActorRoll }
+SPLTC = "SPLTC" { UseActorPitch UseActorRoll }
+SPLTD = "SPLTD" { UseActorPitch UseActorRoll }
+SPLTE = "SPLTE" { UseActorPitch UseActorRoll }
+SPLTF = "SPLTF" { UseActorPitch UseActorRoll }
+SPLTG = "SPLTG" { UseActorPitch UseActorRoll }
+HERPA = "HERPA" { UseActorPitch  angleoffset = 270 }
+HERPB = "HERPB" { UseActorPitch  angleoffset = 270 }
+HERPC = "HERPC" { UseActorPitch  angleoffset = 270 }
+DERPA = "DERPA" { angleoffset = 270 }
+DERPC = "DERPC" { angleoffset = 270 }
+DERPD = "DERPD" { angleoffset = 270 }
+srg2a = "srg2a" { scale = 0.9 }
+srg2b = "srg2b" { scale = 0.9 }
+srg2c = "srg2c" { scale = 0.9 }
+srg2d = "srg2d" { scale = 0.9 }
+srg2e = "srg2e" { scale = 0.9 }
+srg2f = "srg2f" { scale = 0.9 }
+srg2g = "srg2g" { scale = 0.9 }
+srg2h = "srg2h" { scale = 0.9 }
+srg2i = "srg2i" { scale = 0.9 }
+srg2j = "srg2j" { scale = 0.9 }
+srg2k = "srg2k" { scale = 0.9 }
+srg2l = "srg2l" { scale = 0.9 }
+srg2m = "srg2m" { scale = 0.9 }
+srg2n = "srg2n" { scale = 0.9 }
+revla = "revla" { UseActorPitch UseActorRoll  angleoffset = 180 }
+//Liberator
+brfla = "brfla" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brflb = "brflb" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brflc = "brflc" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brfld = "brfld" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brfle = "brfle" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brflf = "brflf" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brflg = "brflg" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brflh = "brflh" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brlla = "brlla" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brllb = "brllb" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brllc = "brllc" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brlld = "brlld" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brlle = "brlle" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brllf = "brllf" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brllg = "brllg" { UseActorPitch UseActorRoll  angleoffset = 180 }
+brllh = "brllh" { UseActorPitch UseActorRoll  angleoffset = 180 }
+//fix by dastrukar
+//ZM66
+rifla = "rifla" { UseActorPitch UseActorRoll angleoffset = 180 }
+riflb = "rifla" { UseActorRoll angleoffset = 90 UseActorPitch }
+riflc = "riflc" { UseActorRoll angleoffset = 90 UseActorPitch }
+rifld = "rifld" { UseActorPitch UseActorRoll angleoffset = 180 }
+rifsa = "rifsa" { UseActorPitch UseActorRoll angleoffset = 180 }
+rifsd = "rifsd" { UseActorPitch UseActorRoll angleoffset = 180 }
+rigla = "rigla" { UseActorPitch UseActorRoll angleoffset = 180 }
+riglb = "rigla" { UseActorRoll angleoffset = 90 UseActorPitch }
+riglc = "riglc" { UseActorRoll angleoffset = 90 UseActorPitch }
+rigld = "rigld" { UseActorPitch UseActorRoll angleoffset = 180 }
+rigsa = "rigsa" { UseActorPitch UseActorRoll angleoffset = 180 }
+rigsd = "rigsd" { UseActorPitch UseActorRoll angleoffset = 180 }
+//
+rmaga = "rmaga" { UseActorPitch UseActorRoll angleoffset = 180 scale = 0.6 }
+rmagb = "rmagb" { UseActorPitch UseActorRoll angleoffset = 180 scale = 0.6 }
+eshla = "eshla" { scale = 0.7 }
+shela = "shela" { scale = 0.7 }
+shl1a = "eshlc" { scale = 0.7 }
+eshlb = "eshlb" { scale = 0.7 }
+eshlc = "eshlc" { scale = 0.7 }
+eshld = "eshlb" { angleoffset = 180 scale = 0.7 }
+eshle = "eshla" { angleoffset = 180 scale = 0.7 }
+eshlf = "eshlf" { scale = 0.7 }
+eshlg = "eshlg" { scale = 0.7 }
+eshlh = "eshlf" { angleoffset = 180 scale = 0.7 }
+//syrga = "syrba" { scale = 0.8 }
+roqpa = "roqpa" { scale = 0.8 }
+rocqa = "rocqa" { scale = 0.9 UseActorPitch }
+rocqb = "rocqa" { UseActorPitch  scale = 0.9 UseActorPitch }
+ten7a = "ten7a" {}
+ten9a = "ten9a" {}
+borfa = "borfa" { UseActorPitch UseActorRoll angleoffset = 90 }
+broca = "broca" {}
+bshxa = "bshxa" {}
+bshxb = "bshxb" {}
+bshxc = "bshxc" {}
+fraga = "fraga" { angleoffset = 180 UseActorPitch }
+fragb = "fragb" { angleoffset = 180 UseActorPitch }
+fragc = "fragc" { angleoffset = 180 UseActorPitch }
+fragd = "fragb" { angleoffset = 0 UseActorPitch }
+fragf = "fragf" { angleoffset = 180 UseActorPitch }
+frgpa = "frgpa" { angleoffset = 180 UseActorPitch }
+3boxa = "3boxa" { angleoffset = 180 }
+7boxa = "7boxa" { angleoffset = 180 }
+9boxa = "9boxa" { angleoffset = 180 }
+armsa = "arm1a" { angleoffset = 180 }
+armsb = "arm1a" { angleoffset = 180 }
+armca = "armca" { angleoffset = 180 } 
+armcb = "armca" { angleoffset = 180 }
+bgrna = "bgrna" { angleoffset = 180 }
+bgrnb = "bgrnb" { angleoffset = 180 }
+pblda = "pblda" { angleoffset = 180 }
+jpoda = "jpoda" {}
+jpaka = "jpaka" {}
+cella = "cella" {}
+cellb = "cellb" { angleoffset = 180 }
+cellc = "cellc" { angleoffset = 180 }
+celld = "celld" {}
+clp2a = "clp2a" { UseActorPitch  scale = 0.5 }
+clp2b = "clp2b" { scale = 0.5 }
+clp3a = "clp3a" { scale = 0.5 }
+clp3b = "clp3b" { scale = 0.5 }
+iedka = "iedka" {}
+iedsa = "iedsa" {}
+iedsb = "iedsb" {}
+iedsc = "iedsc" {}
+hcapa = "hcapa" {}
+pistb = "pistb" { UseActorPitch UseActorRoll angleoffset = 180 }
+pistc = "pistc" { UseActorPitch UseActorRoll angleoffset = 180 }
+pistd = "pistd" { UseActorPitch UseActorRoll angleoffset = 180 }
+ambxa = "ambxa" {}
+ambxb = "ambxb" {}
+rldra = "rldra" { angleoffset = 180 }
+rclpa = "rclpa" { angleoffset = 180 }
+rclpb = "rclpb" { angleoffset = 180 }
+rclpc = "rclpc" { angleoffset = 180 }
+rclpd = "rclpd" { angleoffset = 180 }
+rclpe = "rclpe" { angleoffset = 180 }
+smgna = "smgna" { UseActorPitch UseActorRoll /* angleoffset = 180 */}
+smgnb = "smsnb" { UseActorPitch UseActorRoll /* angleoffset = 180 */}
+smsna = "smsnb" { UseActorPitch UseActorRoll /* angleoffset = 180 */}
+smsnb = "smsnb" { UseActorPitch UseActorRoll /* angleoffset = 180 */}
+launa = "launb" { UseActorPitch UseActorRoll angleoffset = 270 }
+vulca = "vulca" { UseActorPitch UseActorRoll }
+blopa = "blopa" { UseActorPitch UseActorRoll angleoffset = 180 }
+prifa = "prifa" { UseActorPitch UseActorRoll angleoffset = 180 }
+ladda = "lada" {}
+laddb = "ladb" {}
+laddc = "ladc" {}
+laddd = "ladd" { angleoffset = 180 }
+bal7a = "bal7a" { UseActorPitch }
+bal7b = "bal7b" { UseActorPitch }
+fir7a = "fir7a" {}
+fir7b = "fir7b" {}
+fatba = "fatba" { UseActorPitch }
+fatbb = "fatbb" { UseActorPitch }
+/*plyca = "playa" { UseActorPitch UseActorRoll }
+plycb = "playb" { UseActorPitch UseActorRoll }
+plycc = "playc" { UseActorPitch UseActorRoll }
+plycd = "playd" { UseActorPitch UseActorRoll }
+plyce = "playe" { UseActorPitch UseActorRoll }
+plycf = "playf" { UseActorPitch UseActorRoll }
+plycg = "playg" { UseActorPitch UseActorRoll }*/
+//rclpf = "rclpf" {}
+
+// no spin
+csawa = "csawa" { UseActorPitch UseActorRoll  angleoffset = 90 }
+pista = "pista" { UseActorPitch UseActorRoll angleoffset = 180 }
+plasa = "plasa" { UseActorPitch UseActorRoll }
+bfuga = "bfuga" { UseActorPitch UseActorRoll angleoffset = 270 }
+pvisa = "pvisa" { UseActorPitch UseActorRoll }
+launb = "launa" { UseActorPitch UseActorRoll angleoffset = 270 }
+pvisb = "pvisb" { UseActorPitch UseActorRoll }
+pmapa = "pmapa" {}
+pmapb = "pmapb" {}
+pmapc = "pmapc" {}
+pmapd = "pmapd" {}
+pmape = "pmape" {}
+pmapf = "pmapf" {}
+pmapg = "pmapg" {}
+pmaph = "pmaph" {}
+suita = "suita" {}
+bon1a = "bon1a" {UseActorPitch }
+bon1b = "bon1b" {UseActorPitch }
+bon1c = "bon1c" {UseActorPitch }
+bon1d = "bon1d" {UseActorPitch }
+bon2a = "bon2a" {}
+bon2b = "bon2b" {}
+bon2c = "bon2c" {}
+bon2d = "bon2d" {}
+bkeya = "bkeya" {}
+bkeyb = "bkeyb" {}
+rkeya = "rkeya" {}
+rkeyb = "rkeyb" {}
+ykeya = "ykeya" {}
+ykeyb = "ykeyb" {}
+bskua = "bskua" {}
+bskub = "bskub" {}
+rskua = "rskua" {}
+rskub = "rskub" {}
+yskua = "yskua" {}
+yskub = "yskub" {}
+
+rocka = "rocka" { UseActorPitch UseActorRoll }
+
+bon2a = "bon2a" { UseActorPitch UseActorRoll }
+bon2b = "bon2b" { UseActorPitch UseActorRoll }
+bon2c = "bon2c" { UseActorPitch UseActorRoll }
+bon2d = "bon2d" { UseActorPitch UseActorRoll }
+
+//prmre = "prmre" { Scale = 1.15 }

@@ -36,12 +36,12 @@ class Bubble_WornMedikit : Bubble_WornShells
         MEDI A 1 {
 			if(target.findinventory(ShellType)==target.player.mo.invSel&&target == players[consoleplayer].camera){
 			pitch=-90;
-			angle=target.angle-90;
+			angle=CheckVoxels()?Target.Angle:target.angle-90;
 			if(target.height>34){lower=33;reach=1;Shift=-8;}
 			else if (target.height>20){lower=35;reach=1;Shift=-8;}
 			else {}}
 			else{
-			angle=target.angle;
+			angle=CheckVoxels()?Target.Angle+90:target.angle-90;
 			Lower=21;
 			Reach=-6;
 			shift=0;
@@ -113,7 +113,7 @@ class Bubble_WornStim : Bubble_WornMedikit
     {
     Spawn:
         STIM A 1 {pitch=-90;
-				  angle=target.angle-90;
+				  angle=CheckVoxels()?Target.Angle:target.angle-90;
 			if(target.height>34){}
 			else if (target.height>20){}
 			else {}}
@@ -172,15 +172,15 @@ class Bubble_WornStapler : Bubble_WornStim
 			scale=rw.Scale;
 			roll=90;
 			if(target.findinventory(ShellType)==target.player.mo.invsel){
-			pitch=-90;
-			angle=target.angle-90;
+			pitch=CheckVoxels()?0:-90;
+			angle=CheckVoxels()?Target.Angle+90:target.angle-90;
 			if(target.height>34){lower=33;reach=1;Shift=-8;}
 			else if (target.height>20){lower=35;reach=1;Shift=-8;}
 			else {}}
 			
 			else{
-			pitch=-90;
-			angle=target.angle-90;
+			pitch=CheckVoxels()?0:-90;
+			angle=CheckVoxels()?Target.Angle+90:target.angle-90;
 			if(target.height>34){}
 			else if (target.height>20){}
 			else {}}}
@@ -265,7 +265,8 @@ class Bubble_WornHerp : Bubble_WornDerp
 		{
 		Spawn:
 			HERP A 1{
-			if(target.findinventory(ShellType)==target.player.mo.invsel){pitch=-90;angle=target.angle;
+			Pitch=CheckVoxels()?90:-90;
+			if(target.findinventory(ShellType)==target.player.mo.invsel){angle=target.angle;
 			if(target.height>34){lower=33;reach=1;Shift=-8;}
 			else if (target.height>20){lower=35;reach=1;Shift=-8;}
 			else {}}
@@ -338,7 +339,7 @@ class Bubble_WornBlurSphere : Bubble_WornStim
 		else if(visible)A_SetRenderStyle(1, STYLE_Normal);
 		if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
 
-			pitch=Random(-92,-88);
+			pitch=CheckVoxels()?Random(-62,-58):Random(-92,-88);
 			if(target.findinventory(ShellType)==target.player.mo.invsel){
 			angle=target.angle-Random(92,88);
 			if(target.height>34){lower=Random(32,33);reach=1;Shift=-7;}
@@ -484,7 +485,8 @@ Class Bubble_WornGoggles : Bubble_WornMedikit
 	override bool CheckVisible(Actor target)
     {
 		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
-		return hdb_worntoggle>0 && target.findinventory(ShellType)&&!(target.findinventory(ShellType)==Target.player.readyweapon&&Target.player.mo.FindInventory(ShellType).amount<2) && (hdb_wornitems>-1 && !(target == players[consoleplayer].camera&&PortableLiteAmp(target.findinventory(ShellType)).worn));
+		return hdb_worntoggle>0 && target.findinventory(ShellType)&&!(target.findinventory(ShellType)==Target.player.readyweapon&&Target.player.mo.FindInventory(ShellType).amount<2) && (hdb_wornitems>-1 && !(target == players[consoleplayer].camera&&
+		PortableLiteAmp(target.findinventory(ShellType)).worn));
     }
 	override void Tick()
     {
@@ -501,34 +503,40 @@ Class Bubble_WornGoggles : Bubble_WornMedikit
         MoveHome();
 		CheckUsing();
     }
+	
+	Override Void PostBeginPlay()
+	{
+		if(CheckVoxels())Pitch_Affected = false;
+		Super.PostBeginPlay();
+	}
     states
     {
     Spawn:
         PVIS A 1{
-			pitch=-90;
-			if(target.findinventory(ShellType)==target.player.mo.invsel&&!PortableLiteAmp(target.findinventory(ShellType)).worn){
+			pitch=CheckVoxels()?0:-90;//Worn
+			if(target.findinventory(ShellType)==target.player.mo.invsel&&!PortableLiteAmp(target.findinventory(ShellType)).worn){//Selected
 			angle=target.angle;
 			Shift=0;
 			Lower=0;
-			Pitch=target.pitch-130;
-			if(target.height>34){Reach=3;Lower=0;}
+			Pitch=CheckVoxels()?-40:target.pitch-130;
+			if(target.height>34){Reach=CheckVoxels()?10:3;Lower=0;}
 			else if(target.height>20){Reach=4;Lower=18;}
 			else{}}
 			
-			else if(!PortableLiteAmp(target.findinventory(ShellType)).worn){
+			else if(!PortableLiteAmp(target.findinventory(ShellType)).worn){//Not selected
 			angle=target.angle;
 			Shift=0;
 			Lower=-2;
-			Pitch=target.pitch-170;
-			if(target.height>34){Reach=1;Lower=-2;}
+			Pitch=CheckVoxels()?-80:target.pitch-170;
+			if(target.height>34){Reach=CheckVoxels()?6:1;Lower=-2;}
 			else if(target.height>20){Reach=2;Lower=16;}
 			else{}}
-			else{
+			else{//Worn
 			angle=target.angle;
 			Shift=0;
 			Lower=2;
-			Pitch=Target.pitch-90;
-			if(target.height>34){Reach=3;Lower=2;}
+			Pitch=CheckVoxels()?0:Target.pitch-90;
+			if(target.height>34){Reach=CheckVoxels()?12:3;Lower=CheckVoxels()?6:2;}
 			else if(target.height>20){Reach=4;Lower=20;}
 			else{}}}
         Wait;
@@ -546,6 +554,9 @@ Class Bubble_WornSuit : Bubble_WornMedikit
     }
     states
     {
+	Sprites:
+		SUIT C 0;
+		Stop;
     Spawn:
         SUIT B 1{
 			if(HDPickup(target.findInventory("WornRadsuit")))Frame=2;
@@ -584,6 +595,10 @@ Class Bubble_WornArmourPickup : Bubble_WornMedikit
     }
     states
     {
+	Sprites:
+		ARMS H 0;
+		ARMC H 0;
+		Stop;
     Spawn:
         ARMS # 1{
 			pitch=-90;
@@ -594,13 +609,13 @@ Class Bubble_WornArmourPickup : Bubble_WornMedikit
 			else if(Armour.mags[Armour.mags.size()-1]<=57)Frame=5;
 			else if(Armour.mags[Armour.mags.size()-1]<=86)Frame=4;
 			else if(Armour.mags[Armour.mags.size()-1]<=115)Frame=3;
-			else if(Armour.mags[Armour.mags.size()-1]>115)Frame=0;}
+			else if(Armour.mags[Armour.mags.size()-1]>115)Frame=7;}
 			else {Sprite=GetSpriteIndex("ARMC");
 			if(Armour.mags[Armour.mags.size()-1]<=1014)Frame=6;
 			else if(Armour.mags[Armour.mags.size()-1]<=1028)Frame=5;
 			else if(Armour.mags[Armour.mags.size()-1]<=1042)Frame=4;
 			else if(Armour.mags[Armour.mags.size()-1]<=1056)Frame=3;
-			else if(Armour.mags[Armour.mags.size()-1]>1056)Frame=0;}
+			else if(Armour.mags[Armour.mags.size()-1]>1056)Frame=7;}
 			if(HDPickup(target.findinventory(ShellType))==target.player.mo.invsel){
 			angle=target.angle-90;
 			if(target.height>34){lower=33;reach=1;Shift=-7;}
@@ -639,7 +654,7 @@ class Bubble_WornShield : Bubble_WornBlurSphere
 		else if(visible&&target.findinventory(ShellType)==target.player.mo.invsel)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());}
         if (visible && tics != -1 && --tics <= 0 && !SetState(CurState.NextState)) return;
 			
-			pitch=-90;
+			pitch=CheckVoxels()?-45:-90;
         	if(target.findinventory(ShellType)==target.player.mo.invsel){
 			angle=target.angle-90;
 			if(target.height>34){lower=32;reach=1;Shift=-7;}
@@ -683,7 +698,7 @@ class Bubble_WornMagicShield : Bubble_WornShield
     {
     Spawn:
         BON2 # 1{
-			pitch=-90;
+			pitch=CheckVoxels()?-45:-90;
 			if(target.findinventory(ShellType)==target.player.mo.invsel){
 			if(target.findinventory(ShellType).amount<=256)Frame=0;
 			else if(target.findinventory(ShellType).amount<=512)Frame=1;
@@ -716,7 +731,7 @@ class Bubble_WornTalisman : Bubble_WornStim
 			
 			
 			if(target.findinventory(ShellType)==target.player.mo.invsel){
-			pitch=-90;
+			pitch=CheckVoxels()?0:-90;
 			angle=target.angle-90;
 			if(target.height>34){lower=32;reach=1;Shift=-7;}
 			else if (target.height>20){lower=35;reach=1;Shift=-8;}
@@ -810,7 +825,7 @@ class Bubble_WornPotion2 : Bubble_WornStim//Too lazy to change the original clas
 			if(target.findinventory(ShellType)==target.player.mo.invsel){
 			Sprite=GetSpriteIndex("BON1");
 			Frame=Random(0,3);
-			pitch=-90;
+			pitch=CheckVoxels()?0:-90;
 			angle=target.angle-90;
 			if(target.height>34){lower=33;reach=1;Shift=-8;}
 			else if (target.height>20){lower=35;reach=1;Shift=-8;}
@@ -822,7 +837,7 @@ class Bubble_WornPotion2 : Bubble_WornStim//Too lazy to change the original clas
 			if(target.findinventory(ShellType)==target.player.mo.invsel){
 			Sprite=GetSpriteIndex("BON1");
 			Frame=Random(0,3);
-			pitch=-90;
+			pitch=CheckVoxels()?0:-90;
 			angle=target.angle-90;
 			if(target.height>34){lower=33;reach=1;Shift=-8;}
 			else if (target.height>20){lower=35;reach=1;Shift=-8;}
@@ -915,6 +930,10 @@ class Bubble_WornArmor : HideousBubble
     }
 	States
 	{
+	Sprites:
+		ARMC H 0;
+		ARMS H 0;
+		Stop;
 	Spawn:
 	ARMC # 1{
 			let inva=HDPickup(target.findinventory("HDArmourWorn"));
@@ -927,13 +946,13 @@ class Bubble_WornArmor : HideousBubble
 			else if(invb.durability<=57)Frame=5;
 			else if(invb.durability<=86)Frame=4;
 			else if(invb.durability<=115)Frame=3;
-			else if(invb.durability>115)Frame=0;}
+			else if(invb.durability>115)Frame=7;}
 			else {Sprite=GetSpriteIndex("ARMC");
 			if(invb.durability<=14)Frame=6;
 			else if(invb.durability<=28)Frame=5;
 			else if(invb.durability<=42)Frame=4;
 			else if(invb.durability<=56)Frame=3;
-			else if(invb.durability>56)Frame=0;}
+			else if(invb.durability>56)Frame=7;}
 			}
 			else if(invc){Sprite=GetSpriteIndex("SUIT");Frame=1;}
 			angle=target.angle;Pitch=-90;
@@ -990,9 +1009,12 @@ class Bubble_WornArmorForOthers : HideousBubble
 		Else if (target.height>20)//{
 		/*if(target.height>=15)*/armheight1=target.height*0.01;//210
 		//}
-		
-        home = (target.pos.xy, target.pos.z+onafloor+armheight1);
-        SetOrigin(home, true);
+		Vector3 Offset;
+		if (!players[consoleplayer].camera) return;
+		offset = Vec3To(players[consoleplayer].camera).Unit() * (0.1 + Target.Vel.XY.Length());
+        offset.z = 0;
+        home = (target.pos.xy, target.pos.z+onafloor+armheight1) + offset;
+        SetOrigin(home, false);
     }
 	override void Tick()
     {
@@ -1031,6 +1053,8 @@ class Bubble_WornArmorForOthers : HideousBubble
         -FORCEXYBILLBOARD
         HideousBubble.pitch_affected false;
 		Scale 1.0;
+		HideousBubble.reach 0.;
+		HideousBubble.shift 0.;
     }
 	States
 	{
@@ -1059,6 +1083,8 @@ class Bubble_WornArmorForOthers : HideousBubble
 	Wait;		
 	}
 }
+
+//Class Bubble_WornArmorForOthersBack : Bubble_WornArmorForOthers {Default{HideousBubble.reach -0.005; HideousBubble.shift 0.;}}
 
 class Bubble_WornKeys : HideousBubble
 {

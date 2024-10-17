@@ -1,5 +1,13 @@
 class Bubble_WornGrenade : HideousBubble
 {
+	bool CheckVoxels()
+	{
+		String CheckVox = "CheelloRocket";
+		Class CheckChello = CheckVox;
+		if(CheckChello)Return True;
+		Return False;
+	}
+	
 	int GranCount;
 	Property Grancount:Grancount;
 	int HoldUseKey;
@@ -59,7 +67,7 @@ class Bubble_WornGrenade : HideousBubble
     states
     {
     Spawn:
-        FRAG A 1 {if(target.player.crouching>=1) angle = target.angle; }
+        FRAG A 1 { angle = target.angle; }
         Wait;
     }
 }
@@ -150,6 +158,14 @@ class Bubble_WornShells : HideousBubble
 	property addonweapon1:AddonWeap1;
 	property ShellType:ShellType;
 	property ShellType2:ShellType2;
+	
+	bool CheckVoxels()
+	{
+		String CheckVox = "CheelloRocket";
+		Class CheckChello = CheckVox;
+		if(CheckChello)Return True;
+		Return False;
+	}
 	
 	int HoldUseKey;
 	Void CheckUsing()
@@ -994,9 +1010,9 @@ class Bubble_Worn4Mag : Bubble_WornShells
 			else if(curmag<11)frame=4;
 			else frame=curmag/5+3;}
 			}
-			if(target.height>34){pitch=-90;lower=default.lower;}
-			else if(target.height>20){pitch=-60;lower=default.lower+13;}
-			else {pitch=0;lower=34;}}
+			if(target.height>34){pitch=CheckVoxels()?0:-90;lower=default.lower;}
+			else if(target.height>20){pitch=CheckVoxels()?30:-60;lower=default.lower+13;}
+			else {pitch=CheckVoxels()?-90:0;lower=34;}}
         Wait;
     }
 }
@@ -2158,7 +2174,7 @@ class Bubble_WornHEAT : Bubble_WornShells
     states
     {
     Spawn:
-        ROCK A 1{angle=target.angle+10;pitch=-90;
+        ROCK A 1{angle=target.angle+10;pitch=CheckVoxels()?180:-90;
 		if(target.height>34){lower=19;}
 		else if(target.height>20){lower=25;}
 		else {lower=34;}}
@@ -2176,7 +2192,7 @@ class Bubble_WornHEAT_2 : Bubble_WornHEAT
     states
     {
     Spawn:
-        ROCK A 1{angle=target.angle;pitch=-90;
+        ROCK A 1{angle=target.angle;pitch=CheckVoxels()?180:-90;
 		if(target.height>34){lower=25;}
 		else if(target.height>20){lower=31;}
 		else {lower=34;}}
@@ -2194,7 +2210,7 @@ class Bubble_WornHEAT_3 : Bubble_WornHEAT
     states
     {
     Spawn:
-        ROCK A 1{angle=target.angle-10;pitch=-90;
+        ROCK A 1{angle=target.angle-10;pitch=CheckVoxels()?180:-90;
 		if(target.height>34){lower=31;}
 		else if(target.height>20){lower=37;}
 		else {lower=34;}}
@@ -2212,7 +2228,7 @@ class Bubble_WornHEAT_4 : Bubble_WornHEAT
     states
     {
     Spawn:
-        ROCK A 1{angle=target.angle-30;pitch=-90;
+        ROCK A 1{angle=target.angle-30;pitch=CheckVoxels()?180:-90;
 		if(target.height>34){lower=33;}
 		else if(target.height>20){lower=39;}
 		else {lower=34;}}
@@ -2229,7 +2245,7 @@ class Bubble_WornHEAT_5 : Bubble_WornHEAT_4
     states
     {
     Spawn:
-        ROCK A 1{angle=target.angle+30;pitch=-90;
+        ROCK A 1{angle=target.angle+30;pitch=CheckVoxels()?180:-90;
 		if(target.height>34){lower=33;}
 		else if(target.height>20){lower=39;}
 		else {lower=34;}}
@@ -2246,7 +2262,7 @@ class Bubble_WornHEAT_6 : Bubble_WornHEAT_3
     states
     {
     Spawn:
-        ROCK A 1{angle=target.angle+10;pitch=-90;
+        ROCK A 1{angle=target.angle+10;pitch=CheckVoxels()?180:-90;
 		if(target.height>34){lower=31;}
 		else if(target.height>20){lower=37;}
 		else {lower=34;}}
@@ -2271,7 +2287,7 @@ class Bubble_WornHEAT_8 : Bubble_WornHEAT
     states
     {
     Spawn:
-        ROCK A 1{angle=target.angle-10;pitch=-90;
+        ROCK A 1{angle=target.angle-10;pitch=CheckVoxels()?180:-90;
 		if(target.height>34){lower=19;}
 		else if(target.height>20){lower=25;}
 		else {lower=34;}}
