@@ -5,5 +5,5 @@ nosave int hdb_wornkeys =1;
 nosave int hdb_wornweapons = 1;
 nosave int hdb_worntoggle = 1;
 nosave int hdb_grn = 1;
-nosave int hdb_wornoutofsync = 1;
+server bool hdb_wornoutofsync = true;
 nosave int hdb_wornarmor = 2;
