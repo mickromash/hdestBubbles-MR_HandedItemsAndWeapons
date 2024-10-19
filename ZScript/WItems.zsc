@@ -642,10 +642,15 @@ class Bubble_WornShield : Bubble_WornBlurSphere
 		Bubble_WornShells.ShellType "ShieldCore";
 		Scale 0.5;
     }
+	Override Void PostBeginPlay()
+	{
+		if(Players[1].mo)Destroy();
+		Super.PostBeginPlay();
+	}
 	override void Tick()
     {
         if (isFrozen() || !HDestBubbleHandler.CheckPlayer(PlayerPawn(target))) return;
-		if(hdb_wornoutofsync)Destroy();
+		
         if (CheckVisible(target) != visible) SetVisible(!visible);
         if (bDestroyed) return;
         if (visible && target.GetRenderStyle() !=STYLE_Normal)A_SetRenderStyle(Target.alpha, Target.GetRenderStyle());
@@ -812,8 +817,13 @@ class Bubble_WornPotion2 : Bubble_WornStim//Too lazy to change the original clas
 		Bubble_WornShells.ShellType "HDHealingPotion";
 		Scale 0.4;
     }
+	Override Void PostBeginPlay()
+	{
+		if(Players[1].mo)Destroy();
+		Super.PostBeginPlay();
+	}
+	
 	override void Tick(){
-	if(hdb_wornoutofsync)Destroy();
 	super.tick();
 	if(target.findinventory("HDHealingPotion") && hdb_wornammo>=0 && target.findinventory("HDHealingPotion") != target.player.ReadyWeapon)SetStateLabel("Spawn");
 	else SetStateLabel("Waiting");

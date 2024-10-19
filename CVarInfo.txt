@@ -1,9 +1,8 @@
 nosave int hdb_wornammo = 1;
 nosave int hdb_wornmags = 1;
 nosave int hdb_wornitems =1;
-nosave int hdb_wornkeys =1;
+nosave bool hdb_wornkeys = true;
 nosave int hdb_wornweapons = 1;
-nosave int hdb_worntoggle = 1;
+nosave bool hdb_worntoggle = true;
 nosave int hdb_grn = 1;
-nosave int hdb_wornoutofsync = 1;
 nosave int hdb_wornarmor = 2;

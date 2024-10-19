@@ -16,9 +16,6 @@ OptionMenu "HDestBubbleMenu"
 	Option "$BUBBLEWORNWEAPONS", "hdb_wornweapons", "BubblesMagWornWeapons"
 	Option "$BUBBLEWORNARMOR", "hdb_wornarmor", "BubbleMagWornArmor"
 	StaticText ""
-	Option "$BUBBLEWORNSYNC", "hdb_wornoutofsync", "OnOff"
-	StaticText "$BUBBLEWORNTURNTHISOFF"
-	StaticText ""
 	StaticText "$BUBBLERECOMENDATION", 1
 	Option "$DSPLYMNU_PLAYERSPRITES", "r_drawplayersprites", "OnOff"
 }
