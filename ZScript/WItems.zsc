@@ -9,6 +9,12 @@ class Bubble_WornMedikit : Bubble_WornShells
 		Bubble_WornShells.ShellType "PortableMedikit";
 		Scale 0.3;
     }
+	Override Void PostBeginPlay()
+	{
+		class<Actor> invcls = ShellType;
+		if(!invcls){Destroy();Return;}
+		Super.PostBeginPlay();
+	}
 	override bool CheckVisible(Actor target)
     {
 		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
@@ -1181,5 +1187,41 @@ class Bubble_WornSkulls : Bubble_WornKeys
 			else {frame=keyframe+7;frametics=random(0,3);}
 			}
 	Wait;		
+	}
+}
+
+Class Bubble_Candle : Bubble_WornMedikit
+{
+	default
+    {
+        HideousBubble.lower 22.;
+        HideousBubble.reach -6.5;
+		HideousBubble.shift 0;
+		Bubble_WornShells.ShellType "HDCandle";
+    }	
+	Override bool CheckVisible(Actor Target)
+	{
+		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
+		return hdb_worntoggle>0 && target.findinventory(ShellType) && (hdb_wornitems>-1&&(target.findinventory(ShellType)==target.player.mo.invsel||HoldUseKey>=hudthreshold1||Target != players[consoleplayer].camera));
+	}
+    states
+    {
+	Spawn:
+        CAND A 1 light("HDCANDLE"){
+			Pitch=-90;
+			if(target.findinventory(ShellType)==target.player.mo.invsel){
+			angle=target.angle-90;
+			if(target.height>34){lower=33;reach=1;Shift=-8;}
+			else if (target.height>20){lower=35;reach=1;Shift=-8;}
+			else {}}
+			
+			else{
+			angle=target.angle;
+			Reach=0;
+			shift=0;
+			if(target.height>34)Lower=0;
+			else if (target.height>20)Lower=15;
+			else Lower=20;}}
+        Wait;
 	}
 }
