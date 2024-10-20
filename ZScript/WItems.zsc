@@ -1204,6 +1204,11 @@ Class Bubble_Candle : Bubble_WornMedikit
 		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
 		return hdb_worntoggle>0 && target.findinventory(ShellType) && (hdb_wornitems>-1&&(target.findinventory(ShellType)==target.player.mo.invsel||HoldUseKey>=hudthreshold1||Target != players[consoleplayer].camera));
 	}
+	override void Tick(){
+	super.tick();
+	if(target.findinventory(ShellType) && hdb_worntoggle>=0)SetStateLabel("Spawn");
+	else SetStateLabel("Waiting");
+	}
     states
     {
 	Spawn:
@@ -1223,5 +1228,8 @@ Class Bubble_Candle : Bubble_WornMedikit
 			else if (target.height>20)Lower=15;
 			else Lower=20;}}
         Wait;
+	Waiting:
+        CAND A 1;
+        Wait;	
 	}
 }
