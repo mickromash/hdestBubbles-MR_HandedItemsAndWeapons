@@ -1,5 +1,5 @@
 class Bubble_WornMedikit : Bubble_WornShells
-{	
+{
     default
     {
 		-YFLIP
@@ -19,7 +19,8 @@ class Bubble_WornMedikit : Bubble_WornShells
     {
 		int hudthreshold1=max(12,GetCVar("hd_hudusedelay"));
 		class<Actor> invcls = ShellType;
-		return hdb_worntoggle>0 && target.findinventory(ShellType)&&!(target.findinventory(ShellType)==Target.player.readyweapon&&HDWeapon(target.findInventory(ShellType)).actualamount<2) && (hdb_wornitems>-1&&(target.findinventory(ShellType)==target.player.mo.invsel||HoldUseKey>=hudthreshold1));
+		return hdb_worntoggle>0 && target.findinventory(ShellType)&&!(target.findinventory(ShellType)==Target.player.readyweapon&&
+		HDWeapon(target.findInventory(ShellType)).actualamount<2) && (hdb_wornitems>-1&&(target.findinventory(ShellType)==target.player.mo.invsel||HoldUseKey>=hudthreshold1));
     }
 	override void Tick()
     {
@@ -1027,10 +1028,10 @@ class Bubble_WornArmorForOthers : HideousBubble
 		//}
 		Vector3 Offset;
 		if (!players[consoleplayer].camera) return;
-		offset = Vec3To(players[consoleplayer].camera).Unit() * (0.1 + Target.Vel.XY.Length());
+		offset = Vec3To(players[consoleplayer].camera).Unit() * (0.1 + sqrt(Target.Vel.XY.Length())*3 );
         offset.z = 0;
-        home = (target.pos.xy, target.pos.z+onafloor+armheight1) + offset;
-        SetOrigin(home, false);
+        Warp(Target, Offset.X, Offset.Y, onafloor+armheight1 + Offset.Z, Target.Angle,
+		WARPF_ABSOLUTEOFFSET|WARPF_NOCHECKPOSITION|WARPF_COPYINTERPOLATION|WARPF_COPYVELOCITY|WARPF_ABSOLUTEANGLE);
     }
 	override void Tick()
     {
